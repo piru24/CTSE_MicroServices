@@ -1,0 +1,22 @@
+{
+  "name": "email",
+  "version": "1.0.0",
+  "description": "",
+  "main": "email-server.js",
+  "scripts": {
+    "start": "nodemon email-server.js"
+  },
+  "author": "Priyantha Fernando",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.0",
+    "mongoose": "^8.13.2",
+    "nodemailer": "^6.10.1",
+    "nodemon": "^2.0.22"
+  }
+}

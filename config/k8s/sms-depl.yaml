@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sms-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sms
+  template:
+    metadata:
+      labels:
+        app: sms
+    spec:
+      containers:
+        - name: sms-service
+          image: it22358820/sms-service
+          resources:
+            limits:
+              cpu: "500m"
+              memory: "128Mi"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sms-service
+spec:
+  selector:
+    app: sms
+  ports:
+  - name: sms
+    protocol: TCP
+    port: 8200
+    targetPort: 8200
