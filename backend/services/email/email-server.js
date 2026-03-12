@@ -4,7 +4,8 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const app = express();
 const cookieParser = require('cookie-parser');
-
+const { startEmailConsumer } =
+require("./services/rabbitmqConsumer");
 require('dotenv').config();
 
 //declare port
@@ -15,7 +16,11 @@ app.use(cors());
 app.use(bodyParser.json());
 
 app.listen(PORT, () => {
-	console.log(`Email Server is up and running on Port: ${PORT}`)
+
+  console.log(`Email Service running on port ${PORT}`);
+
+  startEmailConsumer();
+
 });
 
 // Declare Route

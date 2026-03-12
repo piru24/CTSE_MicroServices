@@ -4,6 +4,8 @@ const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const app = express();
+const { startDeliveryConsumer } =
+require("./services/rabbitmq");
 
 require('dotenv').config();
 
@@ -20,11 +22,13 @@ const link = "mongodb+srv://Piruthivi:Ruthi24@cluster0.nt1n9me.mongodb.net/food"
 mongoose.connect(link)
   .then(() => {
     console.log("Connected to DataBase");
+startDeliveryConsumer();
 
-    // Start the server only after the DB connection is successful
-    app.listen(PORT, () => {
-      console.log(`Delivery Server is up and running on Port: ${PORT}`);
-    });
+app.listen(PORT, () => {
+
+  console.log(`🚚 Delivery Service running on port ${PORT}`);
+
+});
   })
   .catch((err) => console.log(err));
 

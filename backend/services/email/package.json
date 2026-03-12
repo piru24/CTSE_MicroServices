@@ -9,6 +9,7 @@
   "author": "Priyantha Fernando",
   "license": "ISC",
   "dependencies": {
+    "amqplib": "^0.10.9",
     "body-parser": "^1.20.2",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",

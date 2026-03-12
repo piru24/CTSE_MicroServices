@@ -31,11 +31,10 @@ const productSchema = new Schema({
     ref: "user", // or 'Seller' if you have a separate seller model
     required: true,
   },
-  sellerId: {
-    type: Schema.Types.ObjectId,
-    ref: "user", // or 'Seller' if you have a separate seller model
-    required: true,
-  },
+  sellerAvailable: {
+    type: Boolean,
+    default: true
+  }
 });
 
 module.exports = mongoose.model("Productss", productSchema);

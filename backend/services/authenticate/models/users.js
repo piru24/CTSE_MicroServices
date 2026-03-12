@@ -32,7 +32,15 @@ const userSchema = new Schema({
         default: "buyer"  
        }
        ,
-    isAvailable: { type: Boolean, default: true }
+    isAvailable: { type: Boolean, default: true } ,
+    isVerified: {
+  type: Boolean,
+  default: false
+},
+
+verificationToken: {
+  type: String
+}
     
 })
 
