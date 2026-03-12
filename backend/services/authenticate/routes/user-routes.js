@@ -1,5 +1,5 @@
-const { signUp, login, getUsers, getUserById, getUser, logout, updatePassword, deleteUser, updateProfile, setAvailability, getSellerInfo } = require("../controllers/user-controller");
-const { requireAuth, requireRoleSeller } = require("../middlewares");
+const { signUp, login, getUsers, getUserById, getUser, logout, updatePassword, deleteUser, updateProfile, setAvailability, getSellerInfo, verifyEmail } = require("../controllers/user-controller");
+const { requireAuth, requireRoleSeller, } = require("../middlewares");
 
 const { requireRoleAdmin} = require("../middlewares")
 
@@ -18,6 +18,11 @@ router.patch("/update", requireAuth, updateProfile)
 router.patch("/update/pwd", requireAuth, updatePassword);
 router.get("/seller/me", requireAuth, requireRoleSeller, getSellerInfo);
 router.put("/seller/availability", requireAuth, requireRoleSeller, setAvailability);
+ router.put("/seller/availability", (_req,_res,next)=>{
+  console.log("ROUTE HIT");
+  next();
+}, requireAuth, requireRoleSeller, setAvailability);
+router.get("/verify/:token", verifyEmail);
 
 
 module.exports = router;

@@ -6,8 +6,18 @@ const bodyParser = require("body-parser");
 const cookieParser = require('cookie-parser')
 const cors = require("cors");
 const app = express();
+const { connectRabbitMQ } =
+require("./services/rabbitmq");
 
+const helmet = require("helmet");
+const rateLimit = require("express-rate-limit");
 
+app.use(helmet());
+
+app.use(rateLimit({
+ windowMs: 15 * 60 * 1000,
+ max: 100
+}));
 app.use(cookieParser())
 //declare port
 const PORT = process.env.PORT || 8090;
@@ -29,10 +39,14 @@ mongoose.connect(link, {
 
  
  const connection = mongoose.connection;
- connection.once("open", () => {
-     console.log("MongoDB Connection Success!");
- });
- 
+  connection.once("open", async () => {
+
+  console.log("MongoDB Connection Success!");
+
+  await connectRabbitMQ();
+
+});
+
  app.listen(PORT, () => {
      console.log(`Authentication Server is up and running on Port: ${PORT}`)
  });

@@ -1,4 +1,7 @@
 const User = require('../models/users');
+const crypto = require("crypto");
+const { publishUserSignup ,publishUserCreated,publishSellerAvailability} =
+require("../services/rabbitmq");
 
 //importing bcrypt
 const bcrypt = require("bcrypt");
@@ -6,6 +9,8 @@ const bcrypt = require("bcrypt");
 const validator = require('validator')
 //importing jsonwebtoken
 const jwt = require('jsonwebtoken');
+
+
 
 //Creating a Token to give access to users to user services
 //user id and user's role is passed with token
@@ -18,7 +23,10 @@ const createToken = (_id, role, name) => {
 //signup function
 const signUp = async (req, res, next) => {
 
+
   const { name, mobile, email, address, password, role } = req.body;
+  const verificationToken = crypto.randomBytes(32).toString("hex");
+
 console.log(name, mobile, email, address, password, role)
   //validation for all the input fields
   if (!name || !mobile || !email || !address || !password) {
@@ -49,30 +57,29 @@ console.log(name, mobile, email, address, password, role)
 
 
   //creating a new User
-  const user = new User({
-    name,
-    mobile,
-    email,
-    address,
-    password: hashedpassword,
-    role: role || "buyer"
-  });
+const user = new User({
+  name,
+  mobile,
+  email,
+  address,
+  password: hashedpassword,
+  role: role || "buyer",
+  verificationToken
+});
 
   try {
     await user.save();//saving document(a new user to) into DB
+publishUserSignup({
+  userId: user._id,
+  email: user.email,
+  token: verificationToken
+});
 
-        const token = createToken(user._id, user.role, user.name) //calling to createToken function to create a token for user
-
-
-        //Create and setting a cookie with the user's ID and token
-        res.cookie("token", token, {
-          path: "/",
-          expires: new Date(Date.now() + 1000 * 60 * 30),
-          httpOnly: true,
-          sameSite: "lax"
-        })
-
-    res.status(201).json({ message: "user succesfully registered", User:user, token })//sending the new user details with token as a message for the response
+        res.status(201).json({
+  message: "Registration successful. Please verify your email before logging in.",
+  userId: user._id,
+  email: user.email
+});
   } catch (err) {
     console.log(err);
     throw new Error('Error saving user');
@@ -105,6 +112,11 @@ const login = async (req, res, next) => {
   if (!loggeduser) {
     return res.status(400).json({ message: "User not found.Sign up please" })
   }
+  if (!loggeduser.isVerified) {
+  return res.status(403).json({
+    message: "Please verify your email before logging in"
+  });
+}
 
   //checking password and comare it with exist user's password in the db
   const isPasswordCorrect = bcrypt.compareSync(password, loggeduser.password);
@@ -291,9 +303,18 @@ const updatePassword = async (req, res) => {
 
   return res.status(200).json({ message: 'Password updated successfully.' });
 };
+
+
+
       // Set seller (restaurant) availability
 const setAvailability = async (req, res) => {
   try {
+
+      console.log("SET AVAILABILITY HIT");
+console.log("UserID:", req.userId);
+console.log("Role:", req.userRole);
+console.log("Body:", req.body);
+
     const userId = req.userId;
     const { isAvailable } = req.body;
     // Only allow sellers to update this
@@ -303,10 +324,18 @@ const setAvailability = async (req, res) => {
     }
     user.isAvailable = isAvailable;
     await user.save();
+
+    publishSellerAvailability({
+  sellerId: user._id,
+  isAvailable: user.isAvailable
+});
+
     res.json({ message: "Availability updated", isAvailable: user.isAvailable });
   } catch (err) {
     res.status(500).json({ message: "Server error" });
   }
+
+
 };
 
 // Get seller (restaurant) info including availability
@@ -329,6 +358,37 @@ const getSellerInfo = async (req, res) => {
   }
 };
 
+
+const verifyEmail = async (req, res) => {
+
+  const token = req.params.token;
+
+  const user = await User.findOne({
+    verificationToken: token
+  });
+
+  if (!user) {
+    return res.status(400).json({
+      message: "Invalid verification token"
+    });
+  }
+
+  user.isVerified = true;
+  user.verificationToken = null;
+
+  await user.save();
+
+  publishUserCreated({
+  userId: user._id,
+  email: user.email,
+  role: user.role
+});
+
+  res.json({
+    message: "Email verified successfully"
+  });
+};
+
 exports.signUp = signUp;
 exports.login = login;
 exports.getUserById = getUserById;
@@ -340,4 +400,5 @@ exports.updateProfile = updateProfile;
 exports.updatePassword = updatePassword;
 exports.setAvailability = setAvailability;
 exports.getSellerInfo = getSellerInfo;
+exports.verifyEmail = verifyEmail;
 

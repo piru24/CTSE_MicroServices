@@ -6,6 +6,8 @@ const cors = require("cors");
 const router = require("./order-route/order-route");
 const app = express();
 const cookieParser = require('cookie-parser');
+const { startUserCreatedConsumer } =
+require("./services/rabbitmqConsumer");
 
 //declare port
 const PORT = process.env.PORT || 8020; 
@@ -33,9 +35,12 @@ connection.once("open", () => {
 );
 
 app.listen(PORT, () => {
-    console.log(`Order Server is up and running on Port: ${PORT}`)
-}
-);
+
+  console.log(`Order Service running on port ${PORT}`);
+
+  startUserCreatedConsumer();
+
+});
 
 // mongoose.connect(link)
 // 	.then(()=>console.log("Connected to DataBase"))

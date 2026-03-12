@@ -322,7 +322,7 @@ const RegisterModal = ({ isOpen, onClose, onSuccess }) => {
 
       onSuccess();
     } catch (err) {
-      setApiError(err.response?.data?.message || 'Registration failed');
+      setApiError(err.response?.data?.message || 'Verify Ur Email');
     } finally {
       setIsSubmitting(false);
     }
