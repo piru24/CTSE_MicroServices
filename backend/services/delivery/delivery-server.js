@@ -11,7 +11,7 @@ require('dotenv').config();
 const PORT = process.env.PORT || 8300;
 
 // Using dependencies
-app.use(cors({credentials: true, origin: "http://localhost:3000/"}));
+app.use(cors({credentials: true, origin: "http://localhost:3000"}));
 app.use(bodyParser.json());
 
 const link = "mongodb+srv://Piruthivi:Ruthi24@cluster0.nt1n9me.mongodb.net/food";

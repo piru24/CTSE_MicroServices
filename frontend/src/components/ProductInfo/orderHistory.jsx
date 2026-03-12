@@ -12,7 +12,7 @@ const OrderHistory = () => {
   useEffect(() => {
     const getOrders = async () => {
       try {
-        const res = await axios.get('http://food-app.127.0.0.1.nip.io/order/orderhistory', { 
+        const res = await axios.get('http://localhost:8020/order/orderhistory', { 
           withCredentials: true 
         });
         setOrders(Array.isArray(res.data) ? res.data : []);

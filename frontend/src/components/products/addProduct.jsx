@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import swal from "sweetalert2";
 import axios from "axios";
@@ -6,6 +7,7 @@ import { MdFastfood, MdAddPhotoAlternate } from "react-icons/md";
 import { FaRegCalendarAlt, FaRupeeSign, FaWeight } from "react-icons/fa";
 
 export default function AddProducts() {
+  const { token } = useSelector((state) => state.auth);
   const [isUploading, setIsUploading] = useState(false);
   const navigate = useNavigate();
   const [products, setProducts] = useState({
@@ -31,7 +33,9 @@ export default function AddProducts() {
   const addProducts = (e) => {
     e.preventDefault();
     axios
-      .post("http://food-app.127.0.0.1.nip.io/products/addProduct", products, { withCredentials: true })
+      .post("http://localhost:8070/products/addProduct", products, { withCredentials: true, headers: {
+      Authorization: `Bearer ${token}`
+    } })
       .then(() => {
         swal.fire({
           title: "Product added successfully!",

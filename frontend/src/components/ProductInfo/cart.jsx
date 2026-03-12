@@ -31,7 +31,7 @@ const Cart = () => {
       weight: randomWeight,
     };
     const deliveryResult = await axios.post(
-      "http://food-app.127.0.0.1.nip.io/delivery/rate",
+      "http://localhost:8300/delivery/rate",
       deliveryData
     );
     setVisibility(true);
@@ -62,7 +62,7 @@ const Cart = () => {
   useEffect(() => {
     const makeRequest = async () => {
       try {
-        const res = await axios.post("http://food-app.127.0.0.1.nip.io/order/payment", {
+        const res = await axios.post("http://localhost:8020/order/payment", {
           tokenId: stripeToken.id,
           amount: cart.total,
         });
@@ -87,7 +87,7 @@ const Cart = () => {
     };
     try {
       const res = await axios.post(
-        "http://food-app.127.0.0.1.nip.io/order/addOrder",
+        "http://localhost:8020/order/addOrder",
         orderData
       );
       console.log(orderData);

@@ -37,7 +37,7 @@ export default function AddPayment() {
     e.preventDefault();
     try {
       const paymentRes = await axios.post(
-        "http://food-app.127.0.0.1.nip.io/payment/card",
+        "http://localhost:8500/payment/card",
         newPayment,
         { withCredentials: true }
       );
@@ -58,7 +58,7 @@ export default function AddPayment() {
         status: "pending",
       };
       const orderRes = await axios.post(
-        "http://food-app.127.0.0.1.nip.io/order/addOrder",
+        "http://localhost:8020/order/addOrder",
         orderData,
         { withCredentials: true }
       );

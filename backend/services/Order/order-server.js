@@ -12,7 +12,7 @@ const PORT = process.env.PORT || 8020;
 app.use(cookieParser());
 
 //using dependencies
-app.use(cors({credentials: true, origin: "http://localhost:3000/",
+app.use(cors({credentials: true, origin: "http://localhost:3000",
     credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE'] 
 }));

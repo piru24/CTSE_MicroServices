@@ -18,7 +18,7 @@ const ViewOrders = () => {
   useEffect(() => {
     const getOrders = async () => {
       try {
-        const res = await axios.get(`http://food-app.127.0.0.1.nip.io/order/getOrders`);
+        const res = await axios.get(`http://localhost:8020/order/getOrders`);
         setOrders(res.data);
       } catch (err) {
         console.error("Error fetching orders:", err);
@@ -31,7 +31,7 @@ const ViewOrders = () => {
   const handleUpdateState = async (orderId, newState) => {
     try {
       const res = await axios.put(
-        `http://food-app.127.0.0.1.nip.io/order/updateOrder/${orderId}`,
+        `http://localhost:8020/order/updateOrder/${orderId}`,
         { status: newState }
       );
       const updatedOrder = res.data;

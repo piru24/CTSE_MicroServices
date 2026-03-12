@@ -25,7 +25,7 @@ const UpdateACC = () => {
   useEffect(() => {
     const getUser = async () => {
       try {
-        await axios.get("http://food-app.127.0.0.1.nip.io/user/profile").then((res) => {
+        await axios.get("http://localhost:8090/user/profile").then((res) => {
           setInputs(res.data.user);
         });
       } catch (err) {
@@ -37,7 +37,7 @@ const UpdateACC = () => {
 
   const sendData = async () => {
     try {
-      const res = await axios.patch("http://food-app.127.0.0.1.nip.io/user/update", {
+      const res = await axios.patch("http://localhost:8090/user/update", {
         name: inputs.name,
         mobile: inputs.mobile,
         email: inputs.email,

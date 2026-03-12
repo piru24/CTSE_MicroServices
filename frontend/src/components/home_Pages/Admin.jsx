@@ -11,7 +11,7 @@ const Admin = () => {
   useEffect(() => {
     const getUsers = async () => {
       try {
-        const response = await axios.get("http://food-app.127.0.0.1.nip.io/user/users", { withCredentials: true });
+        const response = await axios.get("http://localhost:8090/user/users", { withCredentials: true });
         const users = response.data.users.map((user) => ({
           id: user._id,
           name: user.name,

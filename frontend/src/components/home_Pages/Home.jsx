@@ -58,7 +58,7 @@ const staticProducts = [
 
 
 const Home = () => {
-  const { isLoggedIn } = useSelector((state) => state.auth);
+  const { isLoggedIn, token } = useSelector((state) => state.auth);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [cartItems, setCartItems] = useState([]);
@@ -72,9 +72,12 @@ const Home = () => {
         let fetched = [];
         if (isLoggedIn) {
           const res = await axios.get(
-            "http://food-app.127.0.0.1.nip.io/products/getProducts",
+            "http://localhost:8070/products/getProducts",
             {
               withCredentials: true,
+                headers: {
+      Authorization: `Bearer ${token}`
+    }
             }
           );
           fetched = res.data;

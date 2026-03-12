@@ -24,7 +24,7 @@ const UpdatePWD = () => {
   useEffect(() => {
     const getUser = async () => {
       try {
-        const res = await axios.get("http://food-app.127.0.0.1.nip.io/user/profile", {
+        const res = await axios.get("http://localhost:8090/user/profile", {
           withCredentials: true,
         });
         setUser(res.data.user || {});
@@ -44,7 +44,7 @@ const UpdatePWD = () => {
     }
     try {
       await axios.patch(
-        "http://food-app.127.0.0.1.nip.io/user/update/pwd",
+        "http://localhost:8090/user/update/pwd",
         { oldPassword, newPassword },
         { withCredentials: true }
       );

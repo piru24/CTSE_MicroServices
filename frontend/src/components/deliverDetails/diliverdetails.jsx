@@ -17,7 +17,7 @@ const DeliveryTracking = () => {
 
     try {
       const response = await axios.put(
-        `http://localhost:3000//order/updateOrder/${orderDetails._id}`,
+        `http://localhost:8020/order/updateOrder/${orderDetails._id}`,
         { status: 'on the way' }
       );
       
@@ -39,7 +39,7 @@ const DeliveryTracking = () => {
 
     try {
       const response = await axios.put(
-        `http://food-app.127.0.0.1.nip.io/order/updateOrder/${orderDetails._id}`,
+        `http://localhost:8020/order/updateOrder/${orderDetails._id}`,
         { status: 'arrived' }
       );
       
@@ -61,7 +61,7 @@ const DeliveryTracking = () => {
 
     try {
       const response = await axios.put(
-        `http://food-app.127.0.0.1.nip.io/order/updateOrder/${orderDetails._id}`,
+        `http://localhost:8020/order/updateOrder/${orderDetails._id}`,
         { status: 'completed' }
       );
       
@@ -79,7 +79,7 @@ const DeliveryTracking = () => {
 
 
   useEffect(() => {
-    axios.get(`http://food-app.127.0.0.1.nip.io/user/${cusid}`)
+    axios.get(`http://localhost:8090/user/${cusid}`)
       .then(response => setUser(response.data.user))
       .catch(error => console.error('Error fetching user details:', error));
   }, []);

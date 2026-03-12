@@ -28,7 +28,7 @@ const RateFormSeller = () => {
         reviews: review,
       };
       const response = await axios.post(
-        "http://food-app.127.0.0.1.nip.io/review/addReview",
+        "http://localhost:8079/review/addReview",
         reviewData,
         {
           withCredentials: true,

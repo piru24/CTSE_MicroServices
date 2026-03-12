@@ -20,7 +20,7 @@ const SellerDashboard = () => {
       setLoading(true); // Start loading
       try {
         const sellerRes = await axios.get(
-          "http://food-app.127.0.0.1.nip.io/user/profile",
+          "http://localhost:8090/user/profile",
           {
             withCredentials: true,
           }
@@ -28,7 +28,7 @@ const SellerDashboard = () => {
         setSellerInfo(sellerRes.data.user);
 
         const productsRes = await axios.get(
-          `http://food-app.127.0.0.1.nip.io/products/${sellerRes.data.user._id}/products`,
+          `http://localhost:8070/products/${sellerRes.data.user._id}/products`,
           { withCredentials: true }
         );
         setProducts(productsRes.data);
@@ -53,7 +53,7 @@ const SellerDashboard = () => {
   const handleDelete = async (productId) => {
     try {
       await axios.delete(
-        `http://food-app.127.0.0.1.nip.io/products/deleteProduct/${productId}`,
+        `http://localhost:8070/products/deleteProduct/${productId}`,
         {
           withCredentials: true,
         }
@@ -75,7 +75,7 @@ const SellerDashboard = () => {
 
       if (editingProduct) {
         const res = await axios.put(
-          `http://food-app.127.0.0.1.nip.io/products/updateProduct/${editingProduct._id}`,
+          `http://localhost:8070/products/updateProduct/${editingProduct._id}`,
           productData,
           { withCredentials: true }
         );
@@ -84,7 +84,7 @@ const SellerDashboard = () => {
         );
       } else {
         const res = await axios.post(
-          "http://food-app.127.0.0.1.nip.io/products/addProduct",
+          "http://localhost:8070/products/addProduct",
           productData,
           { withCredentials: true }
         );

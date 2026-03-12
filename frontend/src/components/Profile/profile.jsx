@@ -23,7 +23,7 @@ const Profile = () => {
 
   const sendRequest = async () => {
     const res = await axios
-      .get("http://food-app.127.0.0.1.nip.io/user/profile", {
+      .get("http://localhost:8090/user/profile", {
         withCredentials: true,
       })
       .catch((err) => console.log(err));
@@ -34,7 +34,7 @@ const Profile = () => {
 
   const sendProductRequest = async (sellerId) => {
     const res = await axios
-      .get(`http://food-app.127.0.0.1.nip.io/products/${sellerId}/products`, {
+      .get(`http://localhost:8070/products/${sellerId}/products`, {
         withCredentials: true,
       })
       .catch((err) => console.log(err));
@@ -65,7 +65,7 @@ const Profile = () => {
           timer: 2000,
         });
 
-        axios.delete("http://food-app.127.0.0.1.nip.io/user/deleteUser").then(() => {
+        axios.delete("http://localhost:8090/user/deleteUser").then(() => {
           swal({
             title: "Your account has been deleted",
             icon: "success",
@@ -102,7 +102,7 @@ const Profile = () => {
         });
 
         axios.delete(
-          `http://food-app.127.0.0.1.nip.io/products/deleteProduct/${product_id}`
+          `http://localhost:8070/products/deleteProduct/${product_id}`
         );
 
         const newProductlist = products.filter(

@@ -129,8 +129,8 @@ const dummyCardPayment = async (req, res, next) => {
       text: `Your Payment of Rs.${amount} was received by Food@door`
     }
     
-    const emailResult = await axios.post("http://localhost:3000//email/sendMail", emaildata, config);
-    const smsResult = await axios.post("http://localhost:3000//sms/sendSms", smsData, config);
+    const emailResult = await axios.post("http://localhost:8100/email/sendMail", emaildata, config);
+    const smsResult = await axios.post("http://localhost:8200/sms/sendSms", smsData, config);
 
     const emailSuccess = emailResult.status == 200 ? "PASS" : "FAIL";
     const smsSuccess = smsResult.status == 200 ? "PASS" : "FAIL";

@@ -11,7 +11,8 @@ require('dotenv').config();
 const PORT = process.env.PORT || 8500;
 app.use(cookieParser());
 
-app.use(cors({credentials: true, origin: "http://localhost:3000/"}));
+app.use(cors({credentials: true, origin: "http://localhost:3000"}));
+
 app.use(bodyParser.json());
 
 app.listen(PORT, () => {

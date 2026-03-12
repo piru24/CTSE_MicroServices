@@ -15,7 +15,7 @@ const DeliveryDashboard = () => {
   useEffect(() => {
     const getOrders = async () => {
       try {
-        const res = await axios.get(`http://food-app.127.0.0.1.nip.io/order/dispatchedOrders`);
+        const res = await axios.get(`http://localhost:8020/order/dispatchedOrders`);
         setOrders(res.data);
       } catch (err) {
         console.error("Error fetching dispatched orders", err);
@@ -27,7 +27,7 @@ const DeliveryDashboard = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const userRes = await axios.get('http://food-app.127.0.0.1.nip.io/user/profile');
+        const userRes = await axios.get('http://localhost:8090/user/profile');
         setUser(userRes.data.user);
       } catch (err) {
         console.error(err);

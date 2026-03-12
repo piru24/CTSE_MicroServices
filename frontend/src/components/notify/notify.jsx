@@ -36,7 +36,7 @@ const Notify = () => {
       try {
         setLoading(true);
         const res = await axios.get(
-          `http://food-app.127.0.0.1.nip.io/order/getOrder/${orderId}`,
+          `http://localhost:8020/order/getOrder/${orderId}`,
           { withCredentials: true }
         );
         if (res.data) {
