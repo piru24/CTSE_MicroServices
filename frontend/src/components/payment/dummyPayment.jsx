@@ -125,100 +125,101 @@ export default function AddPayment() {
     }
   };
 
-  return (
-    <div className="bg-gradient-to-br from-gray-500 via-gray-400 to-green-700 p-8 flex items-center justify-center min-h-screen">
-      <div className="bg-white shadow-2xl rounded-2xl p-8 w-full max-w-lg">
-        <div className="flex items-center justify-center gap-3 mb-8">
-          <FaCreditCard className="text-3xl text-green-600" />
-          <h1 className="text-3xl font-bold text-green-800">
-            Secure Payment
-          </h1>
+ return (
+  <div className="bg-gradient-to-b from-gray-50 to-gray-200 p-8 flex items-center justify-center min-h-screen">
+    <div className="bg-white shadow-2xl border border-gray-200 rounded-2xl p-8 w-full max-w-lg">
+      
+      <div className="flex items-center justify-center gap-3 mb-8">
+        <FaCreditCard className="text-3xl text-[#f7941d]" />
+        <h1 className="text-3xl font-bold text-gray-900">
+          Secure Payment
+        </h1>
+      </div>
+
+      <form onSubmit={AddPayment} className="space-y-5">
+
+        <div className="relative">
+          <FaEnvelope className="absolute left-3 top-3 text-[#f7941d]" />
+          <input
+            name="email"
+            type="email"
+            placeholder="Email"
+            required
+            onChange={handleChangeText}
+            className="w-full pl-10 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#f7941d]"
+          />
         </div>
 
-        <form onSubmit={AddPayment} className="space-y-5">
+        <div className="relative">
+          <FaMobileAlt className="absolute left-3 top-3 text-[#f7941d]" />
+          <input
+            name="mobile"
+            type="text"
+            placeholder="Mobile"
+            required
+            onChange={handleChangeText}
+            className="w-full pl-10 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#f7941d]"
+          />
+        </div>
+
+        <div className="relative">
+          <FaCreditCard className="absolute left-3 top-3 text-[#f7941d]" />
+          <input
+            name="number"
+            type="text"
+            placeholder="Card Number"
+            required
+            onChange={handleChangeText}
+            className="w-full pl-10 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#f7941d]"
+          />
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+
+          <input
+            name="expiration"
+            type="text"
+            placeholder="MM/YYYY"
+            required
+            onChange={handleChangeText}
+            className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#f7941d]"
+          />
 
           <div className="relative">
-            <FaEnvelope className="absolute left-3 top-3 text-green-500"/>
+            <FaLock className="absolute left-3 top-3 text-[#f7941d]" />
             <input
-              name="email"
-              type="email"
-              placeholder="Email"
+              name="cvv"
+              type="number"
+              placeholder="CVV"
               required
               onChange={handleChangeText}
-              className="w-full pl-10 p-3 border rounded-lg"
+              className="w-full pl-10 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#f7941d]"
             />
           </div>
 
-          <div className="relative">
-            <FaMobileAlt className="absolute left-3 top-3 text-green-500"/>
-            <input
-              name="mobile"
-              type="text"
-              placeholder="Mobile"
-              required
-              onChange={handleChangeText}
-              className="w-full pl-10 p-3 border rounded-lg"
-            />
-          </div>
+        </div>
 
-          <div className="relative">
-            <FaCreditCard className="absolute left-3 top-3 text-green-500"/>
-            <input
-              name="number"
-              type="text"
-              placeholder="Card Number"
-              required
-              onChange={handleChangeText}
-              className="w-full pl-10 p-3 border rounded-lg"
-            />
-          </div>
+        <div className="relative">
+          <FaUser className="absolute left-3 top-3 text-[#f7941d]" />
+          <input
+            name="name"
+            type="text"
+            placeholder="Cardholder Name"
+            required
+            onChange={handleChangeText}
+            className="w-full pl-10 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#f7941d]"
+          />
+        </div>
 
-          <div className="grid grid-cols-2 gap-4">
+        <button
+          type="submit"
+          className="w-full bg-[#f7941d] text-white p-4 rounded-xl font-bold hover:bg-[#ea7a00] transition"
+        >
+          Confirm Payment
+        </button>
 
-            <input
-              name="expiration"
-              type="text"
-              placeholder="MM/YYYY"
-              required
-              onChange={handleChangeText}
-              className="p-3 border rounded-lg"
-            />
-
-            <div className="relative">
-              <FaLock className="absolute left-3 top-3 text-green-500"/>
-              <input
-                name="cvv"
-                type="number"
-                placeholder="CVV"
-                required
-                onChange={handleChangeText}
-                className="w-full pl-10 p-3 border rounded-lg"
-              />
-            </div>
-
-          </div>
-
-          <div className="relative">
-            <FaUser className="absolute left-3 top-3 text-green-500"/>
-            <input
-              name="name"
-              type="text"
-              placeholder="Cardholder Name"
-              required
-              onChange={handleChangeText}
-              className="w-full pl-10 p-3 border rounded-lg"
-            />
-          </div>
-
-          <button
-            type="submit"
-            className="w-full bg-green-600 text-white p-4 rounded-xl font-bold hover:bg-green-700"
-          >
-            Confirm Payment
-          </button>
-
-        </form>
-      </div>
+      </form>
     </div>
-  );
+  </div>
+);
 }

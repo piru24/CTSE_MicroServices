@@ -1,303 +1,288 @@
 import React, { useState, useEffect } from "react";
-import { FiClock, FiStar, FiSearch } from "react-icons/fi";
-import { MdDeliveryDining } from "react-icons/md";
+import { FiStar, FiSearch, FiShoppingCart } from "react-icons/fi";
+import { MdLocalShipping } from "react-icons/md";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
-
 axios.defaults.withCredentials = true;
 
-// Static product data
 const staticProducts = [
   {
     _id: 1,
-    name: "Margherita Pizza",
-    category: "pizza",
-    price: 12.99,
-    image: "/images/pizza.jpeg",
-    sellerName: "Pizza Palace",
-    sellerAvailable: true,
-    desc: "Classic tomato and mozzarella",
+    name: "Wireless Headphones",
+    category: "electronics",
+    price: 89.99,
+    image: "/images/headphone.jpg",
+    sellerName: "TechWorld",
+    desc: "Noise cancelling wireless headphones",
     avgRating: 4.5
   },
   {
     _id: 2,
-    name: "Cheese Burger",
-    category: "burger",
-    price: 9.99,
-    image: "/images/burger.jpg",
-    sellerName: "Burger Barn",
-    sellerAvailable: true,
-    desc: "Juicy beef patty with cheese",
+    name: "Smart Watch",
+    category: "wearables",
+    price: 129.99,
+    image: "/images/smartwatch.jpg",
+    sellerName: "Gadget Store",
+    desc: "Track fitness, health & notifications",
     avgRating: 4.3
   },
   {
     _id: 3,
-    name: "Chapathi Thosa",
-    category: "thosa",
-    price: 9.99,
-    image: "/images/thosa.jpg",
-    sellerName: "Thosa Kada",
-    sellerAvailable: true,
-    desc: "Soft chapathi style thosa served hot",
-    avgRating: 4.3
+    name: "Gaming Keyboard",
+    category: "gaming",
+    price: 59.99,
+    image: "/images/keyboard.jpg",
+    sellerName: "GameHub",
+    desc: "RGB mechanical gaming keyboard",
+    avgRating: 4.6
   },
   {
     _id: 4,
-    name: "Chicken Biryani",
-    category: "biryani",
-    price: 14.99,
-    image: "/images/biryani.jpeg",
-    sellerName: "Biryani House",
-    sellerAvailable: true,
-    desc: "Spicy aromatic chicken biryani",
+    name: "Bluetooth Speaker",
+    category: "electronics",
+    price: 49.99,
+    image: "/images/speaker.jpg",
+    sellerName: "SoundTech",
+    desc: "Portable powerful bass speaker",
     avgRating: 4.7
   }
 ];
 
-
 const Home = () => {
+
   const { isLoggedIn, token } = useSelector((state) => state.auth);
+
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
-  const [cartItems, setCartItems] = useState([]);
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
 
-  // Fetch products based on login status
   useEffect(() => {
+
     const getProducts = async () => {
+
       try {
+
         let fetched = [];
+
         if (isLoggedIn) {
+
           const res = await axios.get(
             "http://localhost:8070/products/getProducts",
             {
               withCredentials: true,
-                headers: {
-      Authorization: `Bearer ${token}`
-    }
+              headers: {
+                Authorization: `Bearer ${token}`
+              }
             }
           );
+
           fetched = res.data;
+
         }
-        // Merge static + fetched (if any)
+
         const combined = [...staticProducts, ...fetched];
+
         setProducts(combined);
+
         extractCategories(combined);
-      } catch (err) {
+
+      } catch {
+
         setProducts(staticProducts);
         extractCategories(staticProducts);
+
       }
+
     };
+
     getProducts();
-    // eslint-disable-next-line
+
   }, [isLoggedIn]);
 
-  // Extract unique categories
   const extractCategories = (prods) => {
+
     const unique = Array.from(new Set(prods.map((p) => p.category)));
+
     setCategories([
       { name: "All", value: "all" },
       ...unique.map((cat) => ({
         name: cat.charAt(0).toUpperCase() + cat.slice(1),
-        value: cat.toLowerCase(),
+        value: cat,
       })),
     ]);
+
   };
 
-  // // Search products
-  // const searchProduct = async (e) => {
-  //   const searchValue = e.target.value;
-  //   setSearchQuery(searchValue);
-
-  //   try {
-  //     const { data } = await axios.get(
-  //       `http://localhost:8070/products/search/?search=${searchValue}`
-  //     );
-  //     setProducts(data.data.products);
-  //   } catch (err) {
-  //     console.log(err);
-  //   }
-  // };
-  const searchProduct = (e) => {
-    setSearchQuery(e.target.value);
-  };
-
-  // Filter products based on search and category
   const filteredProducts = products.filter((product) => {
-    const matchesSearch =
+
+    const search =
       product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       product.sellerName.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory =
+
+    const category =
       selectedCategory === "all" || product.category === selectedCategory;
-    return matchesSearch && matchesCategory;
+
+    return search && category;
+
   });
 
-  const addToCart = (item) => {
-    setCartItems([...cartItems, item]);
-  };
-
   return (
-    <div className="bg-gradient-to-br from-yellow-500 via-gray-400 to-green-700 min-h-screen">
-      {/* Hero Section with Search */}
+
+    <div className="bg-gray-50 min-h-screen">
+
+      {/* HERO */}
+
       <section
-        className="relative h-80 bg-cover bg-center mb-2"
+        className="h-[40vh] flex items-center justify-center text-center"
         style={{
           backgroundImage:
-            "linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('/images/food-bg2.jpg')",
-          backgroundSize: "fill",
+            "linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('/images/shop-banner.jpg')",
+          backgroundSize: "cover",
           backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
-          height: "40vh",
         }}
       >
-        <div className="container mx-auto px-4 h-full flex items-center justify-center">
-          <div className="text-center max-w-2xl w-full">
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
-              Craving something delicious?
-            </h1>
-            <div className="relative items-center">
-              <input
-                type="text"
-                placeholder="Search restaurants or dishes..."
-                className="w-full px-4 py-2 rounded-full shadow-lg focus:outline-none"
-                value={searchQuery}
-                onChange={searchProduct}
-              />
-              <FiSearch className="absolute right-6 top-2 text-gray-500 text-2xl" />
-            </div>
+
+        <div className="max-w-2xl w-full px-4">
+
+          <h1 className="text-4xl md:text-5xl text-white font-bold mb-6">
+            Discover Amazing Deals on EBuy
+          </h1>
+
+          <div className="relative">
+
+            <input
+              type="text"
+              placeholder="Search products, brands or categories..."
+              className="w-full px-6 py-3 rounded-full shadow-lg"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+
+            <FiSearch className="absolute right-5 top-3 text-gray-500 text-xl" />
+
           </div>
+
         </div>
+
       </section>
-      {/* Featured Products */}
-      <section className="container mx-auto px-4 py-4">
-        <h2 className="text-3xl font-bold text-gray-800 mb-4">
-          Popular Near You
+
+
+      {/* PRODUCTS */}
+
+      <section className="container mx-auto px-4 py-10">
+
+        <h2 className="text-3xl font-bold mb-6 text-gray-800">
+          Trending Products
         </h2>
-        <div className="flex overflow-x-auto pb-4 space-x-4 scrollbar-hide">
+
+
+        {/* CATEGORY FILTER */}
+
+        <div className="flex gap-3 overflow-x-auto pb-4">
+
           {categories.map((category) => (
+
             <button
               key={category.value}
               onClick={() => setSelectedCategory(category.value)}
-              className={`flex-shrink-0 px-6 py-2 rounded-full ${
+              className={`px-6 py-2 rounded-full whitespace-nowrap
+              ${
                 selectedCategory === category.value
-                  ? "bg-green-600 text-white"
-                  : "bg-white text-gray-700 hover:bg-gray-100"
-              } transition-colors shadow-sm`}
+                  ? "bg-[#f7941d] text-white"
+                  : "bg-white border"
+              }`}
             >
               {category.name}
             </button>
+
           ))}
+
         </div>
-        <div className="grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
+
+
+        {/* PRODUCT GRID */}
+
+        <div className="grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-4 mt-6">
+
           {filteredProducts.map((product) => (
+
             <div
               key={product._id}
-              className="bg-white rounded-xl shadow-md hover:shadow-xl transition-shadow"
+              className="bg-white rounded-xl shadow hover:shadow-lg transition"
             >
-              <div className="relative">
-                <img
-                  src={product.image}
-                  alt={product.name}
-                  className="w-full h-48 object-cover rounded-t-xl"
-                />
-                <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black">
-                  <h3 className="text-xl font-semibold text-white">
-                    {product.sellerName}
-                  </h3>
-                </div>
-              </div>
 
-              <div className="p-6">
-                <div className="flex justify-between items-start mb-1">
-                  <div>
-                    <h3 className="text-xl font-semibold text-gray-800">
-                      {product.name}
-                    </h3>
-                    <p className="text-gray-600 mt-1">{product.desc}</p>
-                  </div>
-                  <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">
+              <img
+                src={product.image}
+                alt={product.name}
+                className="h-48 w-full object-cover rounded-t-xl"
+              />
+
+              <div className="p-5">
+
+                <h3 className="font-semibold text-lg">
+                  {product.name}
+                </h3>
+
+                <p className="text-sm text-gray-500">
+                  {product.desc}
+                </p>
+
+
+                <div className="flex justify-between items-center mt-3">
+
+                  <span className="text-[#f7941d] font-bold">
                     ${product.price}
                   </span>
+
+                  <div className="flex items-center text-sm">
+
+                    <FiStar className="text-yellow-500 mr-1" />
+
+                    {product.avgRating}
+
+                  </div>
+
                 </div>
 
-                <div className="flex items-center justify-between text-sm text-gray-600">
-                  <div className="flex items-center space-x-2">
-                    <FiStar className="text-yellow-500" />
-                    <span>{product.avgRating?.toFixed(1) || "4.5"}</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <FiClock />
-                    <span>30-40 min</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <MdDeliveryDining className="text-green-600" />
-                    <span>Free</span>
-                  </div>
+
+                <div className="flex items-center text-sm text-gray-600 mt-3">
+
+                  <MdLocalShipping className="text-[#f7941d] mr-1" />
+
+                  Fast Shipping
+
                 </div>
+
+
                 <Link to="/products">
-                  <button className="w-full mt-4 px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-full transition-colors">
-                    Browse
+
+                  <button className="w-full mt-4 bg-[#f7941d] hover:bg-[#ef6c00] text-white py-2 rounded-lg flex items-center justify-center gap-2">
+
+                    <FiShoppingCart />
+
+                    View Product
+
                   </button>
+
                 </Link>
+
               </div>
+
             </div>
+
           ))}
+
         </div>
+
       </section>
 
-      {/* How It Works */}
-      <section
-        className="bg-white py-16"
-        style={{
-          backgroundImage:
-            "linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('/images/delii.jpg')",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
-          height: "50vh",
-        }}
-      >
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center text-white mb-12">
-            How It Works
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 ">
-            {[
-              {
-                icon: <FiSearch size={40} />,
-                title: "Search",
-                text: "Find your favorite food or restaurant",
-              },
-              {
-                icon: <MdDeliveryDining size={40} />,
-                title: "Order",
-                text: "Customize your order and checkout",
-              },
-              {
-                icon: <FiClock size={40} />,
-                title: "Enjoy",
-                text: "Track delivery and enjoy your meal",
-              },
-            ].map((step, index) => (
-              <div
-                key={index}
-                className="text-green-600 bg-green-100 rounded-full p-4 inline-flex items-center justify-center shadow-lg gap-2"
-              >
-                <div className="text-green-600 bg-white rounded-full p-4 inline-flex items-center justify-center shadow">
-                  {step.icon}
-                  <h3 className="text-xl font-semibold ">{step.title}</h3>
-                </div>
-                <p className="text-gray-600 font-semibold">{step.text}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
     </div>
+
   );
+
 };
 
 export default Home;
