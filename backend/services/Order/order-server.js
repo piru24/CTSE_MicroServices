@@ -19,12 +19,14 @@ app.use(cors({credentials: true, origin: "http://localhost:3000",
   methods: ['GET', 'POST', 'PUT', 'DELETE'] 
 }));
 app.use(bodyParser.json());
-app.use("/Order",router)
-const link="mongodb+srv://Piruthivi:Ruthi24@cluster0.nt1n9me.mongodb.net/food";
+app.use("/order",router)
 
-mongoose.connect(link, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
+mongoose.connect(process.env.MONGO_URI)
+.then(() => {
+    console.log("MongoDB Connection Success!");
+})
+.catch((err) => {
+    console.error("MongoDB connection error:", err);
 });
 
 const connection
@@ -38,7 +40,7 @@ app.listen(PORT, () => {
 
   console.log(`Order Service running on port ${PORT}`);
 
-  startUserCreatedConsumer();
+ // startUserCreatedConsumer();
 
 });
 

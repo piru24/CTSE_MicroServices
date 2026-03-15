@@ -19,14 +19,9 @@ app.use(cors({credentials: true, origin: ["http://localhost:3000", "http://food-
 }));
 app.use(bodyParser.json());
 app.use("/products",router)
-const link="mongodb+srv://Piruthivi:Ruthi24@cluster0.nt1n9me.mongodb.net/food";
-
-mongoose.connect(link, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-});
-
-mongoose.connection.once("open", async () => {
+// MongoDB connection (USE ENV VARIABLE)
+mongoose.connect(process.env.MONGO_URI)
+.then(async () => {
 
   console.log("MongoDB Connected");
 

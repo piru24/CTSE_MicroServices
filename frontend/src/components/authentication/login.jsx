@@ -209,6 +209,9 @@ const LoginModal = ({ isOpen, onClose, onSuccess }) => {
         password: formData.password.trim()
       });
 
+      // ✅ SAVE JWT TOKEN
+localStorage.setItem("token", data.token);
+
       dispatch(authActions.login({
         userId: data.User._id,
         role: data.User.role,

@@ -1,52 +1,65 @@
-require('dotenv').config();// Load shared .env file using path attribute
+require("dotenv").config();
 
 const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
-const cookieParser = require('cookie-parser')
+const cookieParser = require("cookie-parser");
 const cors = require("cors");
-const app = express();
-const { connectRabbitMQ } =
-require("./services/rabbitmq");
-
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 
+const { connectRabbitMQ } = require("./services/rabbitmq");
+
+const app = express();
+
+// ---------------- SECURITY ----------------
 app.use(helmet());
 
-app.use(rateLimit({
- windowMs: 15 * 60 * 1000,
- max: 100
+app.use(
+  rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 100
+  })
+);
+
+// ---------------- MIDDLEWARE ----------------
+app.use(cookieParser());
+
+app.use(cors({
+  credentials: true,
+  origin: "http://localhost:3000"
 }));
-app.use(cookieParser())
-//declare port
+
+app.use(bodyParser.json());
+
+// ---------------- ROUTES ----------------
+const router = require("./routes/user-routes");
+app.use("/user", router);
+
+// ---------------- PORT ----------------
 const PORT = process.env.PORT || 8090;
 
-const router = require('./routes/user-routes');
+// ---------------- DATABASE ----------------
+const MONGO_URI = process.env.MONGO_URI;
 
-//using dependencies
-app.use(cors({credentials: true, origin: "http://localhost:3000"}));
-app.use(bodyParser.json());
-app.use('/user', router)
+mongoose.connect(MONGO_URI);
 
+const connection = mongoose.connection;
 
-const link="mongodb+srv://Piruthivi:Ruthi24@cluster0.nt1n9me.mongodb.net/food";
-
-mongoose.connect(link, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
- });
-
- 
- const connection = mongoose.connection;
-  connection.once("open", async () => {
+connection.once("open", async () => {
 
   console.log("MongoDB Connection Success!");
 
-  await connectRabbitMQ();
+  // Try RabbitMQ but don't crash if not running
+  try {
+    await connectRabbitMQ();
+  } catch (err) {
+    console.log("RabbitMQ not running (skipped)");
+  }
 
 });
 
- app.listen(PORT, () => {
-     console.log(`Authentication Server is up and running on Port: ${PORT}`)
- });
+// ---------------- SERVER ----------------
+app.listen(PORT, () => {
+  console.log(`Authentication Server is up and running on Port: ${PORT}`);
+});

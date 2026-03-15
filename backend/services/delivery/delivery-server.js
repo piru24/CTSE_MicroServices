@@ -1,37 +1,45 @@
 // Import dependencies
+require('dotenv').config();
+
 const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const cors = require("cors");
+
+const { startDeliveryConsumer } = require("./services/rabbitmq");
+const deliveryRouter = require("./routes/delivery-routes");
+
 const app = express();
-const { startDeliveryConsumer } =
-require("./services/rabbitmq");
 
-require('dotenv').config();
-
-// Declare port
+// Port
 const PORT = process.env.PORT || 8300;
 
-// Using dependencies
-app.use(cors({credentials: true, origin: "http://localhost:3000"}));
+// Middlewares
+app.use(cors({
+  origin: "http://localhost:3000",
+  credentials: true
+}));
+
 app.use(bodyParser.json());
 
-const link = "mongodb+srv://Piruthivi:Ruthi24@cluster0.nt1n9me.mongodb.net/food";
-
-// MongoDB connection
-mongoose.connect(link)
-  .then(() => {
-    console.log("Connected to DataBase");
-startDeliveryConsumer();
-
-app.listen(PORT, () => {
-
-  console.log(`🚚 Delivery Service running on port ${PORT}`);
-
-});
-  })
-  .catch((err) => console.log(err));
-
-// Declare Route
-const deliveryRouter = require("./routes/delivery-routes");
+// Routes
 app.use("/delivery", deliveryRouter);
+
+
+// MongoDB connection (USE ENV VARIABLE)
+mongoose.connect(process.env.MONGO_URI)
+.then(() => {
+
+  console.log("MongoDB Connected (Delivery Service)");
+
+  // Start RabbitMQ consumer
+  startDeliveryConsumer();
+
+  app.listen(PORT, () => {
+    console.log(`Delivery Service running on port ${PORT}`);
+  });
+
+})
+.catch((err) => {
+  console.error("MongoDB connection error:", err);
+});

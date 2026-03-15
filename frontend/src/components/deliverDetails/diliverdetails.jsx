@@ -79,10 +79,12 @@ const DeliveryTracking = () => {
 
 
   useEffect(() => {
-    axios.get(`http://localhost:8090/user/${cusid}`)
-      .then(response => setUser(response.data.user))
-      .catch(error => console.error('Error fetching user details:', error));
-  }, []);
+  if (!cusid) return;
+
+  axios.get(`http://localhost:8090/user/${cusid}`)
+    .then(res => setUser(res.data.user))
+    .catch(err => console.error("User fetch failed:", err));
+}, [cusid]);
 
   if (!user) {
     return <div className="flex justify-center items-center h-screen">
