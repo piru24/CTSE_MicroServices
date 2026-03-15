@@ -24,7 +24,7 @@ app.use(bodyParser.json());
 
 app.use("/order", router);
 
-// MongoDB
+// MongoDB connection
 mongoose.connect(process.env.MONGO_URI)
 .then(() => {
 
@@ -34,7 +34,7 @@ mongoose.connect(process.env.MONGO_URI)
 
     console.log(`Order Service running on port ${PORT}`);
 
-    // Connect RabbitMQ publisher
+    // connect RabbitMQ publisher
     await connectRabbitMQ();
 
   });

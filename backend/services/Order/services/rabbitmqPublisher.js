@@ -3,8 +3,8 @@ const amqp = require("amqplib");
 let channel;
 
 async function connectRabbitMQ() {
-
-  const connection = await amqp.connect("amqp://localhost");
+try{
+  const connection = await amqp.connect("amqp://host.docker.internal:5672")
 
   channel = await connection.createChannel();
 
@@ -12,7 +12,10 @@ async function connectRabbitMQ() {
     durable: true
   });
 
-  console.log("📡 RabbitMQ connected (Order Service)");
+ console.log("📡 RabbitMQ connected (Order Service)");
+  } catch (err) {
+    console.error("❌ RabbitMQ connection failed:", err);
+  }
 
 }
 
