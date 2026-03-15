@@ -2,28 +2,38 @@ const Order = require("../model/order");
 const Key = process.env.STRIPE_SECRET_KEY;
 const stripe = require("stripe")(Key);
 
+const { publishOrderDispatched } = require("../services/rabbitmqPublisher");
 
 const addOrder = async (req, res, next) => {
+
   let order;
+
   try {
+
     order = new Order({
       userId: req.userId,
       products: req.body.products,
       amount: req.body.amount,
       status: req.body.status,
     });
+
     await order.save();
+
   } catch (err) {
     console.log(err);
   }
+
   if (!order) {
     return res.status(500).json({ message: "Unable to add" });
   }
+
   return res.status(201).json(order);
 };
 
 const updateOrder = async (req, res, next) => {
+
   try {
+
     const updatedOrder = await Order.findByIdAndUpdate(
       req.params.id,
       {
@@ -31,10 +41,18 @@ const updateOrder = async (req, res, next) => {
       },
       { new: true }
     );
+
+    // 🔥 Publish RabbitMQ event when order is dispatched
+    if (req.body.status === "dispatched") {
+      await publishOrderDispatched(updatedOrder);
+    }
+
     res.status(200).json(updatedOrder);
+
   } catch (err) {
     res.status(500).json(err);
   }
+
 };
 
 const deleteOrder = async (req, res, next) => {
@@ -55,7 +73,6 @@ const getOrder = async (req, res, next) => {
   }
 };
 
-
 const getOrderByBuyersId = async (req, res, next) => {
   try {
     const orders = await Order.find({ userId: req.userId });
@@ -73,13 +90,13 @@ const getAllOrder = async (req, res, next) => {
     res.status(500).json(err);
   }
 };
+
 const stripePay = async (req, res) => {
+
   stripe.charges.create(
     {
       source: req.body.tokenId,
-
       amount: req.body.amount,
-
       currency: "LKR",
     },
 
@@ -91,18 +108,24 @@ const stripePay = async (req, res) => {
       }
     }
   );
-  
+
 };
 
 const getDispatchedOrders = async (req, res) => {
-  try {
-    const orders = await Order.find({ status: "dispatched" });
-    res.status(200).json(orders);
-  } catch (err) {
-    res.status(500).json({ error: "Failed to fetch dispatched orders" });
-  }
-};
 
+  try {
+
+    const orders = await Order.find({ status: "dispatched" });
+
+    res.status(200).json(orders);
+
+  } catch (err) {
+
+    res.status(500).json({ error: "Failed to fetch dispatched orders" });
+
+  }
+
+};
 
 exports.addOrder = addOrder;
 exports.updateOrder = updateOrder;
