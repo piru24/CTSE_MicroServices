@@ -1,27 +1,36 @@
 const amqp = require("amqplib");
 
-let channel;
+let channel = null;
 
 async function connectRabbitMQ() {
+  try {
+    const connection = await amqp.connect(process.env.RABBITMQ_URL);
 
-  const connection = await amqp.connect(process.env.RABBITMQ_URL);
+    channel = await connection.createChannel();
 
-  channel = await connection.createChannel();
+    // Queue for email verification
+    await channel.assertQueue("user_signup", { durable: true });
 
-  // Queue for email verification
-  await channel.assertQueue("user_signup", { durable: true });
+    // Exchange for microservice events
+    await channel.assertExchange("user.events", "topic", {
+      durable: true
+    });
 
-  // Exchange for microservice events
-  await channel.assertExchange("user.events", "topic", {
-    durable: true
-  });
+    console.log("RabbitMQ connected");
 
-  console.log("RabbitMQ connected");
+  } catch (error) {
+    console.log("RabbitMQ connection failed:", error.message);
+  }
 }
 
 
 // Email verification event
 function publishUserSignup(data) {
+
+  if (!channel) {
+    console.log("RabbitMQ not ready. Skipping user_signup event.");
+    return;
+  }
 
   channel.sendToQueue(
     "user_signup",
@@ -35,6 +44,11 @@ function publishUserSignup(data) {
 // Event-driven microservice event
 function publishUserCreated(user) {
 
+  if (!channel) {
+    console.log("RabbitMQ not ready. Skipping user_created event.");
+    return;
+  }
+
   channel.publish(
     "user.events",
     "user.created",
@@ -47,6 +61,11 @@ function publishUserCreated(user) {
 
 function publishSellerAvailability(data) {
 
+  if (!channel) {
+    console.log("RabbitMQ not ready. Skipping seller availability event.");
+    return;
+  }
+
   channel.publish(
     "user.events",
     "seller.availability.changed",
@@ -55,6 +74,7 @@ function publishSellerAvailability(data) {
 
   console.log("Seller availability event published");
 }
+
 
 module.exports = {
   connectRabbitMQ,
