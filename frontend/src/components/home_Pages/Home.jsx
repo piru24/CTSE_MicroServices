@@ -1,4 +1,3 @@
-```javascript
 import React, { useState, useEffect } from "react";
 import { FiStar, FiSearch, FiShoppingCart } from "react-icons/fi";
 import { MdLocalShipping } from "react-icons/md";
@@ -235,4 +234,3 @@ const Home = () => {
 };
 
 export default Home;
-```
