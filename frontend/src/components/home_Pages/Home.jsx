@@ -1,3 +1,4 @@
+```javascript
 import React, { useState, useEffect } from "react";
 import { FiStar, FiSearch, FiShoppingCart } from "react-icons/fi";
 import { MdLocalShipping } from "react-icons/md";
@@ -72,10 +73,8 @@ const Home = () => {
           const res = await axios.get(
             "http://localhost:8070/products/getProducts",
             {
-              withCredentials: true,
-              headers: {
-                Authorization: `Bearer ${token}`
-              }
+              headers: { Authorization: `Bearer ${token}` },
+              withCredentials: true
             }
           );
 
@@ -86,24 +85,19 @@ const Home = () => {
         const combined = [...staticProducts, ...fetched];
 
         setProducts(combined);
-
         extractCategories(combined);
 
       } catch {
-
         setProducts(staticProducts);
         extractCategories(staticProducts);
-
       }
 
     };
 
     getProducts();
-
   }, [isLoggedIn]);
 
   const extractCategories = (prods) => {
-
     const unique = Array.from(new Set(prods.map((p) => p.category)));
 
     setCategories([
@@ -113,11 +107,9 @@ const Home = () => {
         value: cat,
       })),
     ]);
-
   };
 
   const filteredProducts = products.filter((product) => {
-
     const search =
       product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       product.sellerName.toLowerCase().includes(searchQuery.toLowerCase());
@@ -126,15 +118,12 @@ const Home = () => {
       selectedCategory === "all" || product.category === selectedCategory;
 
     return search && category;
-
   });
 
   return (
-
     <div className="bg-gray-50 min-h-screen">
 
       {/* HERO */}
-
       <section
         className="h-[40vh] flex items-center justify-center text-center"
         style={{
@@ -144,7 +133,6 @@ const Home = () => {
           backgroundPosition: "center",
         }}
       >
-
         <div className="max-w-2xl w-full px-4">
 
           <h1 className="text-4xl md:text-5xl text-white font-bold mb-6">
@@ -152,7 +140,6 @@ const Home = () => {
           </h1>
 
           <div className="relative">
-
             <input
               type="text"
               placeholder="Search products, brands or categories..."
@@ -160,36 +147,26 @@ const Home = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
-
             <FiSearch className="absolute right-5 top-3 text-gray-500 text-xl" />
-
           </div>
 
         </div>
-
       </section>
 
-
       {/* PRODUCTS */}
-
       <section className="container mx-auto px-4 py-10">
 
         <h2 className="text-3xl font-bold mb-6 text-gray-800">
           Trending Products
         </h2>
 
-
         {/* CATEGORY FILTER */}
-
         <div className="flex gap-3 overflow-x-auto pb-4">
-
           {categories.map((category) => (
-
             <button
               key={category.value}
               onClick={() => setSelectedCategory(category.value)}
-              className={`px-6 py-2 rounded-full whitespace-nowrap
-              ${
+              className={`px-6 py-2 rounded-full whitespace-nowrap ${
                 selectedCategory === category.value
                   ? "bg-[#f7941d] text-white"
                   : "bg-white border"
@@ -197,18 +174,12 @@ const Home = () => {
             >
               {category.name}
             </button>
-
           ))}
-
         </div>
 
-
         {/* PRODUCT GRID */}
-
         <div className="grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-4 mt-6">
-
           {filteredProducts.map((product) => (
-
             <div
               key={product._id}
               className="bg-white rounded-xl shadow hover:shadow-lg transition"
@@ -222,14 +193,9 @@ const Home = () => {
 
               <div className="p-5">
 
-                <h3 className="font-semibold text-lg">
-                  {product.name}
-                </h3>
+                <h3 className="font-semibold text-lg">{product.name}</h3>
 
-                <p className="text-sm text-gray-500">
-                  {product.desc}
-                </p>
-
+                <p className="text-sm text-gray-500">{product.desc}</p>
 
                 <div className="flex justify-between items-center mt-3">
 
@@ -238,51 +204,35 @@ const Home = () => {
                   </span>
 
                   <div className="flex items-center text-sm">
-
                     <FiStar className="text-yellow-500 mr-1" />
-
                     {product.avgRating}
-
                   </div>
 
                 </div>
 
-
                 <div className="flex items-center text-sm text-gray-600 mt-3">
-
                   <MdLocalShipping className="text-[#f7941d] mr-1" />
-
                   Fast Shipping
-
                 </div>
 
-
                 <Link to="/products">
-
                   <button className="w-full mt-4 bg-[#f7941d] hover:bg-[#ef6c00] text-white py-2 rounded-lg flex items-center justify-center gap-2">
-
                     <FiShoppingCart />
-
                     View Product
-
                   </button>
-
                 </Link>
 
               </div>
 
             </div>
-
           ))}
-
         </div>
 
       </section>
 
     </div>
-
   );
-
 };
 
 export default Home;
+```
