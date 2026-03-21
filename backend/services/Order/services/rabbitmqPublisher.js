@@ -1,10 +1,11 @@
 const amqp = require("amqplib");
 
 let channel;
+const RABBITMQ_URL = process.env.RABBITMQ_URL || "amqp://localhost:5672";
 
 async function connectRabbitMQ() {
 try{
-  const connection = await amqp.connect("amqp://host.docker.internal:5672")
+  const connection = await amqp.connect(RABBITMQ_URL)
 
   channel = await connection.createChannel();
 
