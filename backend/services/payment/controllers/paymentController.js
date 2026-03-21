@@ -1,8 +1,11 @@
 // Dependencies
-const axios = require('axios');
+const crypto = require('crypto');
+const { publishToQueue } = require('../messaging/rabbitmqPublisher');
 
-// Custom Files
-// const k = require("../constants");
+require('dotenv').config();
+
+// E-commerce config (env or defaults)
+const STORE_NAME = process.env.STORE_NAME || 'E-Store';
 
 //ping server
 const pingPaymentServer = (req, res, next) => {
@@ -16,10 +19,7 @@ const pingPaymentServer = (req, res, next) => {
 };
 exports.pingPaymentServer = pingPaymentServer;
 
-
-
-
-// Create Dummy Payment
+// Create payment (e-commerce: card payment with optional order reference)
 const dummyCardPayment = async (req, res, next) => {
   var error;
   const mailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -31,7 +31,8 @@ const dummyCardPayment = async (req, res, next) => {
     email,
     mobile,
     card,
-    amount
+    amount,
+    orderId
   } = req.body;
 
   const cookie = req.headers.cookie;
@@ -109,34 +110,50 @@ const dummyCardPayment = async (req, res, next) => {
       case "expired": return res.status(422).json({err: "Card expired"});
       default: return res.status(500).json({err: "Unknown Error"});
     };
-  }else{
-    console.log("Payment SuccessFul");
+  } else {
+    const transactionId = 'TXN-' + crypto.randomBytes(8).toString('hex').toUpperCase();
+    const orderRef = orderId ? ` Order #${orderId}.` : '';
 
-    const config = {
-      headers: {
-        Cookie: cookie
-      }
-    };
+    console.log("Payment successful", { transactionId, orderId, amount });
 
     const emaildata = {
-      "to": email,
-      "subject": "Payment Received",
-      "message": `Your Transaction of Rs.${amount} to Food@Door is complete`
+      to: email,
+      subject: `Payment received – ${STORE_NAME}`,
+      message: `Your payment of Rs.${amount} to ${STORE_NAME} is complete.${orderRef} Transaction ID: ${transactionId}. Thank you for shopping with us.`,
+      transactionId,
+      orderId: orderId || null,
+      source: 'payment-service'
     };
 
     const smsData = {
-      to: "94721199970",
-      text: `Your Payment of Rs.${amount} was received by Food@door`
-    }
-    
-    const emailResult = await axios.post("http://localhost:8100/email/sendMail", emaildata, config);
-    const smsResult = await axios.post("http://localhost:8200/sms/sendSms", smsData, config);
+      to: mobile || "94721199970",
+      text: `${STORE_NAME}: Payment of Rs.${amount} received.${orderRef} Ref: ${transactionId}`,
+      transactionId,
+      orderId: orderId || null,
+      source: 'payment-service'
+    };
 
-    const emailSuccess = emailResult.status == 200 ? "PASS" : "FAIL";
-    const smsSuccess = smsResult.status == 200 ? "PASS" : "FAIL";
+    let emailSuccess = "FAIL";
+    let smsSuccess = "FAIL";
+    try {
+      await publishToQueue('notification.email', { ...emaildata, cookie });
+      emailSuccess = "QUEUED";
+    } catch (e) {
+      console.warn("Email event publish failed:", e.message);
+    }
+    try {
+      await publishToQueue('notification.sms', { ...smsData, cookie });
+      smsSuccess = "QUEUED";
+    } catch (e) {
+      console.warn("SMS event publish failed:", e.message);
+    }
 
     return res.status(200).json({
-      message: "Payment successful. Rs."+ amount,
+      message: "Payment successful",
+      status: "SUCCESS",
+      transactionId,
+      orderId: orderId || null,
+      amount: Number(amount),
       email: emailSuccess,
       sms: smsSuccess
     });
