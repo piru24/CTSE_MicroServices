@@ -119,7 +119,7 @@ const Header = () => {
       : [];
 
   return (
-    <header className="bg-gradient-to-r from-gray-900 via-green-800 to-green-900 shadow-md sticky top-0 z-50">
+    <header className="bg-gradient-to-r from-orange-600 via-[#f7941d] to-orange-500 shadow-md sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
         <div className="flex justify-between items-center h-20">
           {/* Left: Logo + Nav */}
@@ -127,7 +127,7 @@ const Header = () => {
             <Link to="/" className="flex items-center space-x-3">
               <Logo />
               <span className="text-2xl font-extrabold text-white tracking-wide">
-              Food@Door
+              EBuy
               </span>
             </Link>
 
