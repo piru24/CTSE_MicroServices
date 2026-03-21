@@ -1,46 +1,99 @@
-const jwt = require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
 
-// Authentication middleware
+// ===============================
+// AUTHENTICATION MIDDLEWARE
+// ===============================
 const requireAuth = (req, res, next) => {
   try {
-    const token = req.cookies.token;
-    if (!token) {
-      return res.status(403).json({ message: "Login required!" });
+
+    let token;
+
+    // 1️⃣ Check Authorization header
+    const authHeader = req.headers.authorization;
+
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      token = authHeader.split(" ")[1];
     }
+
+    // 2️⃣ If not found, check cookies
+    if (!token && req.cookies) {
+      token = req.cookies.token;
+    }
+
+    if (!token) {
+      return res.status(403).json({
+        message: "Login required!"
+      });
+    }
+
+    // Verify token
     const decoded = jwt.verify(token, process.env.SECRET);
+
+    // Attach user data
     req.userId = decoded._id;
     req.userRole = decoded.role;
+
     next();
+
   } catch (err) {
     console.error("JWT verification failed:", err);
-    return res.status(401).json({ message: "Invalid token" });
+
+    return res.status(401).json({
+      message: "Invalid token"
+    });
   }
 };
 
-// Generic role checker that accepts multiple roles
+
+// ===============================
+// GENERIC ROLE CHECKER
+// ===============================
 const requireRole = (...allowedRoles) => {
   return (req, res, next) => {
+
     if (!req.userRole) {
-      return res.status(403).json({ message: 'Role information missing' });
+      return res.status(403).json({
+        message: "Role information missing"
+      });
     }
-    
+
     if (allowedRoles.includes(req.userRole)) {
       return next();
     }
-    
-    res.status(403).json({ message: 'Unauthorized - Insufficient permissions' });
+
+    return res.status(403).json({
+      message: "Unauthorized - Insufficient permissions"
+    });
   };
 };
 
-// Specific role checkers (kept for backward compatibility)
-const requireRoleSeller = (req, res, next) => requireRole('seller')(req, res, next);
-const requireRoleAdmin = (req, res, next) => requireRole('admin')(req, res, next);
-const requireRoleBuyer = (req, res, next) => requireRole('buyer')(req, res, next);
-const requireRoleDelivery = (req, res, next) => requireRole('delivery')(req, res, next);
 
+// ===============================
+// SPECIFIC ROLE HELPERS
+// ===============================
+const requireRoleSeller = (req, res, next) => {
+  return requireRole("seller")(req, res, next);
+};
+
+const requireRoleAdmin = (req, res, next) => {
+  return requireRole("admin")(req, res, next);
+};
+
+const requireRoleBuyer = (req, res, next) => {
+  return requireRole("buyer")(req, res, next);
+};
+
+const requireRoleDelivery = (req, res, next) => {
+  return requireRole("delivery")(req, res, next);
+};
+
+
+// ===============================
+// EXPORTS
+// ===============================
 module.exports = {
   requireAuth,
-  requireRole, // The new flexible role checker
+  requireRole,
   requireRoleSeller,
   requireRoleAdmin,
   requireRoleBuyer,

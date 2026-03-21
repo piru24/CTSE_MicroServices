@@ -1,10 +1,11 @@
 const router = require("express").Router();
-const paymentController= require("../controllers/paymentController");
+const paymentController = require("../controllers/paymentController");
 const auth = require("../middlewares");
 
-
+// Ping route
 router.get("/", paymentController.pingPaymentServer);
-router.post("/card", auth.requireAuth, auth.requireRoleBuyer, paymentController.dummyCardPayment);
 
+// Payment route
+router.post("/card", auth.requireAuth, paymentController.dummyCardPayment);
 
 module.exports = router;

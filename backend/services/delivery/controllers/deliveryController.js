@@ -6,7 +6,7 @@ const k = require("../constants");
 
 // const Order = require("../../../Order/models/Order"); 
 const AcceptedDelivery = require('../model/AcceptedDelivery');
-const Delivery = require('../../delivery/model/delivery');
+const Delivery = require('../model/delivery');
 
 
 //ping server
@@ -94,9 +94,9 @@ const getRate = async(req, res, next) => {
 
     }
   }catch(e){
-    console.error(e);
-    return res.status(500).json({ message: "Server Error: "+ err });
-  }
+  console.error(e);
+  return res.status(500).json({ message: "Server Error: " + e });
+}
 
 };
 exports.getRate = getRate;

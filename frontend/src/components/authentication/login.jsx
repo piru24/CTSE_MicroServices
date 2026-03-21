@@ -59,13 +59,14 @@ const LoginModal = ({ isOpen, onClose, onSuccess }) => {
         password: formData.password.trim(),
       });
 
-      dispatch(
-        authActions.login({
-          userId: data.User._id,
-          role: data.User.role,
-          email: data.User.email,
-        })
-      );
+      // ✅ SAVE JWT TOKEN
+localStorage.setItem("token", data.token);
+
+      dispatch(authActions.login({
+        userId: data.User._id,
+        role: data.User.role,
+        email: data.User.email
+      }));
 
       onSuccess();
     } catch (err) {
