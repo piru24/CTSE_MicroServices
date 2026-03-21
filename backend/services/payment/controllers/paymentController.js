@@ -1,6 +1,7 @@
 // Dependencies
 const crypto = require("crypto");
 const { publishToQueue } = require("../messaging/rabbitmqPublisher");
+const Payment = require("../models/payment");
 
 require("dotenv").config();
 
@@ -103,6 +104,22 @@ const dummyCardPayment = async (req, res) => {
     smsSuccess = "QUEUED";
   } catch (e) {
     console.warn("SMS event publish failed:", e.message);
+  }
+
+  try {
+    await Payment.create({
+      transactionId,
+      orderId: orderId || null,
+      email,
+      mobile,
+      amount: Number(amount),
+      cardLast4: String(card.number).slice(-4),
+      status: "SUCCESS",
+      emailNotification: emailSuccess,
+      smsNotification: smsSuccess
+    });
+  } catch (e) {
+    console.warn("Payment DB save failed:", e.message);
   }
 
   return res.status(200).json({

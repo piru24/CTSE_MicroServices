@@ -3,6 +3,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const cookieParser = require('cookie-parser');
+const mongoose = require("mongoose");
 const app = express();
 const { closeRabbitMQ } = require('./messaging/rabbitmqPublisher');
 
@@ -16,9 +17,15 @@ app.use(cors({credentials: true, origin: "http://localhost:3000"}));
 
 app.use(bodyParser.json());
 
-app.listen(PORT, () => {
-	console.log(`Payment Server is up and running on Port: ${PORT}`)
-});
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`Payment Server is up and running on Port: ${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.error("MongoDB connection error:", err);
+  });
 
 process.on('SIGINT', async () => {
   await closeRabbitMQ();

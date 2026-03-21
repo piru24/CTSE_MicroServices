@@ -2,12 +2,13 @@ require("dotenv").config();
 
 const amqp = require("amqplib");
 const nodemailer = require("nodemailer");
+const RABBITMQ_URL = process.env.RABBITMQ_URL || "amqp://localhost:5672";
 
 async function startEmailConsumer() {
 
   try {
 
-    const connection = await amqp.connect("amqp://localhost");
+    const connection = await amqp.connect(RABBITMQ_URL);
 
     const channel = await connection.createChannel();
 
