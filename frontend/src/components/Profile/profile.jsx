@@ -2,22 +2,13 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import swal from "sweetalert";
 import { useNavigate } from "react-router-dom";
-import { FaUserCircle, FaUtensils, FaTrashAlt, FaEdit, FaPlus } from "react-icons/fa";
+import { FaUserCircle, FaTrashAlt, FaEdit } from "react-icons/fa";
 import { MdOutlineFastfood } from "react-icons/md";
 
 axios.defaults.withCredentials = true;
 
 const Profile = () => {
   const [user, setUser] = useState({});
-  const [products, setProducts] = useState([]);
-
-  const handleUpdate = (productId) => {
-    navigate(`/updateProduct/${productId}`);
-  };
-
-  const handleViewOrders = () => {
-    navigate("/viewOrders");
-  };
 
   const navigate = useNavigate();
 
@@ -32,21 +23,9 @@ const Profile = () => {
     return data;
   };
 
-  const sendProductRequest = async (sellerId) => {
-    const res = await axios
-      .get(`http://localhost:8070/products/${sellerId}/products`, {
-        withCredentials: true,
-      })
-      .catch((err) => console.log(err));
-
-    const data = await res.data;
-    return data;
-  };
-
   useEffect(() => {
     sendRequest().then((data) => {
       setUser(data.user);
-      sendProductRequest(data.user._id).then((data) => setProducts(data));
     });
   }, []);
 
@@ -80,39 +59,6 @@ const Profile = () => {
       } else {
         swal({
           title: "Your account is saved",
-          buttons: false,
-          timer: 2000,
-        });
-      }
-    });
-  };
-
-  const handleDelete = (product_id) => {
-    swal({
-      title: "Are you sure?",
-      text: "You want to delete this Product?",
-      icon: "warning",
-      dangerMode: true,
-    }).then((willDelete) => {
-      if (willDelete) {
-        swal("Product is deleted", {
-          icon: "success",
-          buttons: false,
-          timer: 2000,
-        });
-
-        axios.delete(
-          `http://localhost:8070/products/deleteProduct/${product_id}`
-        );
-
-        const newProductlist = products.filter(
-          (product) => product._id !== product_id
-        );
-
-        setProducts(newProductlist);
-      } else {
-        swal({
-          text: "Your Products is saved!",
           buttons: false,
           timer: 2000,
         });

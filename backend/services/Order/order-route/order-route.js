@@ -1,19 +1,67 @@
 const express = require("express");
 const router = express.Router();
-const cart = require("../model/order");
 const orderController= require("../order-controller/order-controller");
-const requireAccess  = require("../middlewares")
-const delivery = require("../model/order");
+const requireAccess  = require("../middlewares");
+const {
+	validateCreateOrder,
+	validateUpdateOrderStatus,
+	validateStripePayment
+} = require("../middleware/validateOrder");
 
-router.post("/addOrder",  requireAccess.requireAuth, requireAccess.requireRoleBuyer, orderController.addOrder);
-router.get("/getOrders", orderController.getAllOrder);
-router.get("/getOrder/:id",orderController.getOrder);
+router.get("/health", orderController.health);
+
+router.post(
+	"/addOrder",
+	requireAccess.requireAuth,
+	requireAccess.requireRoleBuyer,
+	validateCreateOrder,
+	orderController.addOrder
+);
+
+router.get(
+	"/getOrders",
+	requireAccess.requireAuth,
+	requireAccess.requireRole("seller", "admin"),
+	orderController.getAllOrder
+);
+
+router.get(
+	"/getOrder/:id",
+	requireAccess.requireAuth,
+	requireAccess.requireRole("buyer", "seller", "admin", "delivery"),
+	orderController.getOrder
+);
+
 router.get("/orderhistory", requireAccess.requireAuth, requireAccess.requireRoleBuyer, orderController.getOrderByBuyersId);
-router.put("/updateOrder/:id", orderController.updateOrder);
-router.delete("/deleteOrder/:id",requireAccess.requireAuth, requireAccess.requireRoleSeller, orderController.deleteOrder);
 
-router.post("/payment", requireAccess.requireAuth, requireAccess.requireRoleBuyer, orderController.stripePay);
+router.put(
+	"/updateOrder/:id",
+	requireAccess.requireAuth,
+	requireAccess.requireRole("seller", "admin", "delivery"),
+	validateUpdateOrderStatus,
+	orderController.updateOrder
+);
 
-router.get("/dispatchedOrders", requireAccess.requireAuth, requireAccess.requireRoleDelivery, orderController.getDispatchedOrders);
+router.delete(
+	"/deleteOrder/:id",
+	requireAccess.requireAuth,
+	requireAccess.requireRole("seller", "admin"),
+	orderController.deleteOrder
+);
+
+router.post(
+	"/payment",
+	requireAccess.requireAuth,
+	requireAccess.requireRoleBuyer,
+	validateStripePayment,
+	orderController.stripePay
+);
+
+router.get(
+	"/dispatchedOrders",
+	requireAccess.requireAuth,
+	requireAccess.requireRole("delivery", "seller", "admin"),
+	orderController.getDispatchedOrders
+);
 
 module.exports = router;

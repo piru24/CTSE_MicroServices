@@ -21,16 +21,19 @@ app.use(rateLimit({
 app.use(cookieParser())
 //declare port
 const PORT = process.env.PORT || 8090;
+const allowedOrigins = (process.env.CORS_ORIGIN || "http://localhost:3000")
+    .split(",")
+    .map((origin) => origin.trim())
+    .filter(Boolean);
 
 const router = require('./routes/user-routes');
 
 //using dependencies
-app.use(cors({credentials: true, origin: "http://localhost:3000"}));
+app.use(cors({credentials: true, origin: allowedOrigins}));
 app.use(bodyParser.json());
 app.use('/user', router)
 
-
-const link="mongodb+srv://Piruthivi:Ruthi24@cluster0.nt1n9me.mongodb.net/food";
+const link = process.env.MONGO_URI || "mongodb://localhost:27017/ctse_food";
 
 mongoose.connect(link, {
     useNewUrlParser: true,
@@ -43,7 +46,11 @@ mongoose.connect(link, {
 
   console.log("MongoDB Connection Success!");
 
-  await connectRabbitMQ();
+    try {
+        await connectRabbitMQ();
+    } catch (error) {
+        console.warn("Authenticate service started without RabbitMQ:", error.message);
+    }
 
 });
 

@@ -1,5 +1,5 @@
 import React from "react";
-import { FaFacebookF, FaInstagram, FaTwitter, FaApple, FaGooglePlay } from "react-icons/fa";
+import { FaApple, FaGooglePlay } from "react-icons/fa";
 
 const Footer = () => {
   return (
@@ -39,11 +39,21 @@ const Footer = () => {
 
           <div className="flex flex-col gap-3">
 
-            <a className="flex items-center bg-gray-800 px-4 py-2 rounded-lg">
+            <a
+              href="https://www.apple.com/app-store/"
+              target="_blank"
+              rel="noreferrer"
+              className="flex items-center bg-gray-800 px-4 py-2 rounded-lg"
+            >
               <FaApple className="mr-2" /> App Store
             </a>
 
-            <a className="flex items-center bg-gray-800 px-4 py-2 rounded-lg">
+            <a
+              href="https://play.google.com/store"
+              target="_blank"
+              rel="noreferrer"
+              className="flex items-center bg-gray-800 px-4 py-2 rounded-lg"
+            >
               <FaGooglePlay className="mr-2" /> Google Play
             </a>
 

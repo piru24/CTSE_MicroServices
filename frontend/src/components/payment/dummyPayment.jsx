@@ -36,7 +36,7 @@ export default function AddPayment() {
   const AddPayment = async (e) => {
     e.preventDefault();
     try {
-      const paymentRes = await axios.post(
+      await axios.post(
         "http://localhost:8500/payment/card",
         newPayment,
         { withCredentials: true }
@@ -57,7 +57,7 @@ export default function AddPayment() {
         amount: cart.withCommision,
         status: "pending",
       };
-      const orderRes = await axios.post(
+      await axios.post(
         "http://localhost:8020/order/addOrder",
         orderData,
         { withCredentials: true }

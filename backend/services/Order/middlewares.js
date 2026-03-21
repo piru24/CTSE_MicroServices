@@ -1,13 +1,31 @@
 const jwt = require('jsonwebtoken');
+const JWT_SECRET = process.env.JWT_SECRET || process.env.SECRET;
 
 // Authentication middleware
 const requireAuth = (req, res, next) => {
   try {
-    const token = req.cookies.token;
-    if (!token) {
-      return res.status(403).json({ message: "Login required!" });
+    let token = null;
+
+    if (req.cookies && req.cookies.token) {
+      token = req.cookies.token;
     }
-    const decoded = jwt.verify(token, process.env.SECRET);
+
+    if (!token && req.headers.authorization) {
+      const authHeader = req.headers.authorization;
+      if (authHeader.startsWith("Bearer ")) {
+        token = authHeader.split(" ")[1];
+      }
+    }
+
+    if (!token) {
+      return res.status(401).json({ message: "Authentication required" });
+    }
+
+    if (!JWT_SECRET) {
+      return res.status(500).json({ message: "JWT secret not configured" });
+    }
+
+    const decoded = jwt.verify(token, JWT_SECRET);
     req.userId = decoded._id;
     req.userRole = decoded.role;
     next();
@@ -40,7 +58,7 @@ const requireRoleDelivery = (req, res, next) => requireRole('delivery')(req, res
 
 module.exports = {
   requireAuth,
-  requireRole, // The new flexible role checker
+  requireRole,
   requireRoleSeller,
   requireRoleAdmin,
   requireRoleBuyer,

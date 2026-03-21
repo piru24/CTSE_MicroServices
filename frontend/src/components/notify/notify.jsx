@@ -15,7 +15,6 @@ import {
   CircularProgress,
   LinearProgress,
   Chip,
-  Divider,
 } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
@@ -61,11 +60,10 @@ const Notify = () => {
 
   const statusSteps = [
     { label: 'Order Placed', value: 'pending', icon: <PaymentIcon /> },
-    { label: 'Processing', value: 'processing', icon: <HourglassTopIcon /> },
+    { label: 'Confirmed', value: 'confirmed', icon: <HourglassTopIcon /> },
     { label: 'Dispatched', value: 'dispatched', icon: <LocalShippingIcon /> },
-    { label: 'On the Way', value: 'on the way', icon: <AssignmentTurnedInIcon /> },
-    { label: 'Arrived', value: 'arrived', icon: <CheckCircleIcon /> },
-    { label: 'Completed', value: 'completed', icon: <CheckCircleIcon /> }
+    { label: 'Delivered', value: 'delivered', icon: <AssignmentTurnedInIcon /> },
+    { label: 'Cancelled', value: 'cancelled', icon: <CheckCircleIcon /> }
   ];
 
   const getActiveStep = () => {

@@ -85,7 +85,7 @@ const Home = () => {
     };
 
     getProducts();
-  }, [isLoggedIn]);
+  }, [isLoggedIn, token]);
 
   const extractCategories = (prods) => {
     const unique = Array.from(new Set(prods.map((p) => p.category)));

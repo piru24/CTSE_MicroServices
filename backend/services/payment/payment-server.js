@@ -9,9 +9,13 @@ require('dotenv').config();
 
 //declare port
 const PORT = process.env.PORT || 8500;
+const allowedOrigins = (process.env.CORS_ORIGIN || "http://localhost:3000")
+	.split(",")
+	.map((origin) => origin.trim())
+	.filter(Boolean);
 app.use(cookieParser());
 
-app.use(cors({credentials: true, origin: "http://localhost:3000"}));
+app.use(cors({credentials: true, origin: allowedOrigins}));
 
 app.use(bodyParser.json());
 

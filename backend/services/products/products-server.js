@@ -9,17 +9,20 @@ const app = express();
 const { startSellerAvailabilityConsumer } = require("./services/rabbitmqConsumer");
 //declare port
 const PORT = process.env.PORT || 8070;
+const allowedOrigins = (process.env.CORS_ORIGIN || "http://localhost:3000")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
 app.use(cookieParser());
 
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ limit: "10mb", extended: true }));
 
 //using dependencies
-app.use(cors({credentials: true, origin: ["http://localhost:3000", "http://food-app.127.0.0.1.nip.io"]
-}));
+app.use(cors({credentials: true, origin: allowedOrigins}));
 app.use(bodyParser.json());
 app.use("/products",router)
-const link="mongodb+srv://Piruthivi:Ruthi24@cluster0.nt1n9me.mongodb.net/food";
+const link = process.env.MONGO_URI || "mongodb://localhost:27017/ctse_food";
 
 mongoose.connect(link, {
   useNewUrlParser: true,

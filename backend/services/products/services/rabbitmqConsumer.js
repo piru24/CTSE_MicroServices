@@ -1,12 +1,14 @@
-const amqp = require("amqplib");
+const { initRabbitMQ } = require("./rabbitmqClient");
 const Product = require("../model/products");
 
 async function startSellerAvailabilityConsumer() {
 
   try {
+    const { channel } = await initRabbitMQ("products", 2, 2000);
 
-    const connection = await amqp.connect("amqp://localhost");
-    const channel = await connection.createChannel();
+    if (!channel) {
+      return;
+    }
 
     await channel.assertExchange("user.events", "topic", {
       durable: true
@@ -25,6 +27,9 @@ async function startSellerAvailabilityConsumer() {
     console.log("🛒 Product Service listening for seller availability events...");
 
     channel.consume(q.queue, async (msg) => {
+      if (!msg) {
+        return;
+      }
 
       const data = JSON.parse(msg.content.toString());
 

@@ -1,12 +1,13 @@
-const amqp = require("amqplib");
+const { initRabbitMQ } = require("./rabbitmqClient");
 
 async function startUserCreatedConsumer() {
 
   try {
+    const { channel } = await initRabbitMQ("order-consumer", 2, 2000);
 
-    const connection = await amqp.connect("amqp://localhost");
-
-    const channel = await connection.createChannel();
+    if (!channel) {
+      return;
+    }
 
     await channel.assertExchange("user.events", "topic", {
       durable: true
@@ -23,6 +24,9 @@ async function startUserCreatedConsumer() {
     console.log("📦 Order Service listening for events...");
 
     channel.consume(q.queue, (msg) => {
+      if (!msg) {
+        return;
+      }
 
       const routingKey = msg.fields.routingKey;
       const data = JSON.parse(msg.content.toString());

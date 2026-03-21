@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { MdRestaurant, MdDeliveryDining, MdOutlineTimer } from "react-icons/md";
-import { FaRupeeSign } from "react-icons/fa";
+import { MdRestaurant, MdOutlineTimer } from "react-icons/md";
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
 const statusOptions = [
@@ -18,7 +17,9 @@ const ViewOrders = () => {
   useEffect(() => {
     const getOrders = async () => {
       try {
-        const res = await axios.get(`http://localhost:8020/order/getOrders`);
+        const res = await axios.get(`http://localhost:8020/order/getOrders`, {
+          withCredentials: true
+        });
         setOrders(res.data);
       } catch (err) {
         console.error("Error fetching orders:", err);
@@ -32,7 +33,8 @@ const ViewOrders = () => {
     try {
       const res = await axios.put(
         `http://localhost:8020/order/updateOrder/${orderId}`,
-        { status: newState }
+        { status: newState },
+        { withCredentials: true }
       );
       const updatedOrder = res.data;
       setOrders((prevOrders) => {

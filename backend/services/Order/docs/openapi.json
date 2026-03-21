@@ -1,0 +1,136 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Order Service API",
+    "version": "1.0.0",
+    "description": "Order lifecycle and payment endpoints for the CTSE microservices assignment"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8020"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "cookieAuth": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "token"
+      }
+    },
+    "schemas": {
+      "Order": {
+        "type": "object",
+        "properties": {
+          "_id": { "type": "string" },
+          "userId": { "type": "string" },
+          "products": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "productId": { "type": "string" },
+                "name": { "type": "string" },
+                "quantity": { "type": "integer", "minimum": 1 }
+              },
+              "required": ["productId", "name", "quantity"]
+            }
+          },
+          "amount": { "type": "number" },
+          "status": {
+            "type": "string",
+            "enum": ["pending", "confirmed", "dispatched", "delivered"]
+          }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "Service health",
+        "responses": {
+          "200": {
+            "description": "Service is healthy"
+          }
+        }
+      }
+    },
+    "/order/addOrder": {
+      "post": {
+        "summary": "Create an order",
+        "security": [{ "cookieAuth": [] }],
+        "responses": {
+          "201": {
+            "description": "Order created"
+          }
+        }
+      }
+    },
+    "/order/orderhistory": {
+      "get": {
+        "summary": "Get logged-in buyer order history",
+        "security": [{ "cookieAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Buyer order history"
+          }
+        }
+      }
+    },
+    "/order/getOrders": {
+      "get": {
+        "summary": "Get all orders (seller/admin)",
+        "security": [{ "cookieAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "List of orders"
+          }
+        }
+      }
+    },
+    "/order/getOrder/{id}": {
+      "get": {
+        "summary": "Get order by ID",
+        "security": [{ "cookieAuth": [] }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Single order",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Order" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/order/updateOrder/{id}": {
+      "put": {
+        "summary": "Update order status",
+        "security": [{ "cookieAuth": [] }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Updated order"
+          }
+        }
+      }
+    }
+  }
+}

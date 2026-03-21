@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import swal from "sweetalert2";
 import axios from "axios";
-import { MdFastfood, MdImage, MdDescription } from "react-icons/md";
+import { MdFastfood, MdImage } from "react-icons/md";
 import { FaRupeeSign, FaWeight, FaCalendarAlt } from "react-icons/fa";
 
 export default function UpdateProducts() {

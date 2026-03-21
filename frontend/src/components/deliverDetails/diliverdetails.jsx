@@ -18,7 +18,8 @@ const DeliveryTracking = () => {
     try {
       const response = await axios.put(
         `http://localhost:8020/order/updateOrder/${orderDetails._id}`,
-        { status: 'on the way' }
+        { status: 'dispatched' },
+        { withCredentials: true }
       );
       
       setStatus(response.data.status);
@@ -40,7 +41,8 @@ const DeliveryTracking = () => {
     try {
       const response = await axios.put(
         `http://localhost:8020/order/updateOrder/${orderDetails._id}`,
-        { status: 'arrived' }
+        { status: 'delivered' },
+        { withCredentials: true }
       );
       
       setStatus(response.data.status);
@@ -62,7 +64,8 @@ const DeliveryTracking = () => {
     try {
       const response = await axios.put(
         `http://localhost:8020/order/updateOrder/${orderDetails._id}`,
-        { status: 'completed' }
+        { status: 'delivered' },
+        { withCredentials: true }
       );
       
       setStatus(response.data.status);
@@ -79,10 +82,10 @@ const DeliveryTracking = () => {
 
 
   useEffect(() => {
-    axios.get(`http://localhost:8090/user/${cusid}`)
+    axios.get(`http://localhost:8090/user/${cusid}`, { withCredentials: true })
       .then(response => setUser(response.data.user))
       .catch(error => console.error('Error fetching user details:', error));
-  }, []);
+  }, [cusid]);
 
   if (!user) {
     return <div className="flex justify-center items-center h-screen">
@@ -91,10 +94,11 @@ const DeliveryTracking = () => {
   }
 
   const statusColors = {
-    'completed': 'bg-green-100 text-green-800',
-    'on the way': 'bg-yellow-100 text-yellow-800',
-    'arrived': 'bg-blue-100 text-blue-800',
-    'pending': 'bg-gray-100 text-gray-800'
+    'delivered': 'bg-green-100 text-green-800',
+    'dispatched': 'bg-yellow-100 text-yellow-800',
+    'confirmed': 'bg-blue-100 text-blue-800',
+    'pending': 'bg-gray-100 text-gray-800',
+    'cancelled': 'bg-red-100 text-red-800'
   };
 
   return (

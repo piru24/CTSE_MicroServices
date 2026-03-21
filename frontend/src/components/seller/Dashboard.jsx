@@ -11,7 +11,7 @@ const SellerDashboard = () => {
   const [showForm, setShowForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [sellerInfo, setSellerInfo] = useState({});
-  const [isUploading, setIsUploading] = useState(false);
+  const [isUploading] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isAvailable, setIsAvailable] = useState(false);
 

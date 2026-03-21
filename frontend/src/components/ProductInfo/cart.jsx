@@ -62,10 +62,14 @@ const Cart = () => {
   useEffect(() => {
     const makeRequest = async () => {
       try {
-        const res = await axios.post("http://localhost:8020/order/payment", {
-          tokenId: stripeToken.id,
-          amount: cart.total,
-        });
+        const res = await axios.post(
+          "http://localhost:8020/order/payment",
+          {
+            tokenId: stripeToken.id,
+            amount: cart.total,
+          },
+          { withCredentials: true }
+        );
         console.log(res.data);
       } catch (err) {
         console.log(err);
@@ -73,29 +77,6 @@ const Cart = () => {
     };
     stripeToken && makeRequest();
   }, [stripeToken, cart.total]);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const orderData = {
-      products: cart.products.map((product) => ({
-        productId: product._id,
-        name: product.name,
-        quantity: product.quantity,
-      })),
-      amount: cart.withCommision,
-      status: "pending",
-    };
-    try {
-      const res = await axios.post(
-        "http://localhost:8020/order/addOrder",
-        orderData
-      );
-      console.log(orderData);
-      console.log(res.data);
-    } catch (error) {
-      console.error(error);
-    }
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-500 via-gray-400 to-green-700 py-12">

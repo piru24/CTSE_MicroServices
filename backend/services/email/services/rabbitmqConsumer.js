@@ -1,15 +1,16 @@
 require("dotenv").config();
 
-const amqp = require("amqplib");
+const { initRabbitMQ } = require("./rabbitmqClient");
 const nodemailer = require("nodemailer");
 
 async function startEmailConsumer() {
 
   try {
+    const { channel } = await initRabbitMQ("email-consumer", 2, 2000);
 
-    const connection = await amqp.connect("amqp://localhost");
-
-    const channel = await connection.createChannel();
+    if (!channel) {
+      return;
+    }
 
     await channel.assertQueue("user_signup", { durable: true });
 
@@ -26,6 +27,9 @@ async function startEmailConsumer() {
     });
 
     channel.consume("user_signup", async (msg) => {
+      if (!msg) {
+        return;
+      }
 
       const data = JSON.parse(msg.content.toString());
 
