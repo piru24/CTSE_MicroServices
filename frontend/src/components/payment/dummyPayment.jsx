@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import Swal from "sweetalert2";
 import axios from "axios";
@@ -7,6 +7,7 @@ import { FaCreditCard, FaUser, FaEnvelope, FaMobileAlt, FaLock } from "react-ico
 
 export default function AddPayment() {
   const navigate = useNavigate();
+  const location = useLocation();
   const cart = useSelector((state) => state.cart);
 
   const [payments, setPayments] = useState({
@@ -40,10 +41,18 @@ export default function AddPayment() {
       return;
     }
 
-    // Safely calculate amount
+    // Amount from cart page (includes delivery) or fallback to cart totals
+    const fromCart = location.state?.orderTotal;
+    const amountFromNavigation =
+      fromCart !== undefined &&
+      fromCart !== null &&
+      !Number.isNaN(Number(fromCart))
+        ? Number(fromCart)
+        : null;
     const amount =
-      cart?.withCommision ||
-      cart?.total ||
+      amountFromNavigation ??
+      cart?.withCommision ??
+      cart?.total ??
       (cart?.products
         ? cart.products.reduce(
             (sum, p) => sum + (p.price || 0) * (p.quantity || 1),
@@ -60,20 +69,52 @@ export default function AddPayment() {
       return;
     }
 
-    const paymentData = {
-      email: payments.email,
-      mobile: payments.mobile,
-      amount: String(amount), // backend expects numeric string
-      card: {
-        number: payments.number,
-        expiration: payments.expiration,
-        cvv: payments.cvv,
-        name: payments.name
-      }
+    const orderData = {
+      products: cart.products.map((product) => ({
+        productId: product._id,
+        name: product.name,
+        quantity: product.quantity
+      })),
+      amount: amount,
+      status: "pending"
     };
 
     try {
-      // PAYMENT REQUEST
+      // Create order first so we have an orderId to store with the payment record
+      const orderRes = await axios.post(
+        "http://localhost:8020/order/addOrder",
+        orderData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          },
+          withCredentials: true
+        }
+      );
+
+      const newOrderId = orderRes.data?._id;
+      if (!newOrderId) {
+        Swal.fire({
+          title: "Order failed",
+          text: "Could not create order. Please try again.",
+          icon: "error"
+        });
+        return;
+      }
+
+      const paymentData = {
+        email: payments.email,
+        mobile: payments.mobile,
+        amount: String(amount), // backend expects numeric string
+        orderId: String(newOrderId),
+        card: {
+          number: payments.number,
+          expiration: payments.expiration,
+          cvv: payments.cvv,
+          name: payments.name
+        }
+      };
+
       await axios.post(
         "http://localhost:8500/payment/card",
         paymentData,
@@ -90,28 +131,6 @@ export default function AddPayment() {
         icon: "success",
         confirmButtonColor: "#16a34a"
       });
-
-      const orderData = {
-        products: cart.products.map((product) => ({
-          productId: product._id,
-          name: product.name,
-          quantity: product.quantity
-        })),
-        amount: amount,
-        status: "pending"
-      };
-
-      // ORDER CREATION
-      await axios.post(
-        "http://localhost:8020/Order/addOrder",
-        orderData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          },
-          withCredentials: true
-        }
-      );
 
       navigate("/getOrders");
     } catch (error) {
