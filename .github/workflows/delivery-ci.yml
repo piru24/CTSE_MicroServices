@@ -1,0 +1,39 @@
+name: Delivery Service CI/CD
+
+on:
+  push:
+    branches: [ main, working-final-version-delivery ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./backend/services/delivery   # 👈 IMPORTANT FIX
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run basic check
+        run: echo "No tests configured yet"
+
+      - name: Build Docker image
+        run: docker build -t senaratnehimesha/delivery-service:latest .
+
+      - name: Log in to Docker Hub
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+      - name: Push Docker image
+        run: docker push senaratnehimesha/delivery-service:latest
