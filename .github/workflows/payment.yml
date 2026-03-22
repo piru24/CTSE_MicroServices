@@ -1,0 +1,60 @@
+# Payment microservice — builds & deploys when payment code or this workflow changes.
+# Branches: add yours here (e.g. new-payment) — same idea as Delivery from a feature branch.
+name: Payment Service CI/CD
+
+on:
+  workflow_dispatch: # lets you run manually from Actions tab on any branch
+  push:
+    branches:
+      - main
+      - new-payment
+    paths:
+      - 'backend/services/payment/**'
+      - '.github/workflows/payment.yml'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        working-directory: backend/services/payment
+        run: npm ci
+
+      - name: Run npm audit
+        working-directory: backend/services/payment
+        run: npm audit --audit-level=high || true
+
+      - name: Docker login
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build Docker image
+        run: |
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/payment-service:latest ./backend/services/payment
+
+      - name: Push Docker image
+        run: |
+          docker push ${{ secrets.DOCKER_USERNAME }}/payment-service:latest
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Deploy to Azure Container App
+        uses: azure/container-apps-deploy-action@v2
+        with:
+          appName: payment-service
+          resourceGroup: microservices-rg2
+          imageToDeploy: ${{ secrets.DOCKER_USERNAME }}/payment-service:latest
