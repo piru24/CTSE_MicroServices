@@ -13,9 +13,8 @@ const PORT = process.env.PORT || 8050;
 app.use(cors());
 app.use(bodyParser.json());
 app.use("/cart",router)
-const link="mongodb+srv://Piruthivi:Ruthi24@cluster0.nt1n9me.mongodb.net/food";
 
-mongoose.connect(link, {
+mongoose.connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true
 });

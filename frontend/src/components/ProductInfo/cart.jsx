@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useSelector } from "react-redux";
 import axios from "axios";
 import StripeCheckout from "react-stripe-checkout";
@@ -18,7 +18,6 @@ const Cart = () => {
   const [cheapDelivery, setCheapDelivery] = useState();
   const [fastDelivery, setFastDelivery] = useState();
   const [deliveryCharge, setDeliveryCharge] = useState();
-  const [finalTotal, setFinalTotal] = useState();
   const [cheapDeliveryTime, setCheapDeliveryTime] = useState();
   const [fastDeliveryTime, setFastDeliveryTime] = useState();
   const [visibility, setVisibility] = useState(false);
@@ -35,6 +34,8 @@ const Cart = () => {
       deliveryData
     );
     setVisibility(true);
+    setDeliveryType(undefined);
+    setDeliveryCharge(undefined);
     setCheapDelivery(deliveryResult.data.cheapDelivery.rate / 10);
     setFastDelivery(deliveryResult.data.fastDelivery.rate / 10);
     setCheapDeliveryTime(deliveryResult.data.cheapDelivery.duration);
@@ -42,18 +43,23 @@ const Cart = () => {
   };
 
   const handleOptionChange = (event) => {
-    setDeliveryType(event.target.value);
-    setDeliveryCharge(
-      event.target.value === "fast" ? fastDelivery : cheapDelivery
-    );
-    setFinalTotal(cart.withCommision + (event.target.value === "fast" ? fastDelivery : cheapDelivery));
+    const value = event.target.value;
+    setDeliveryType(value);
+    const charge = value === "fast" ? fastDelivery : cheapDelivery;
+    setDeliveryCharge(charge);
   };
 
   const navigate = useNavigate();
 
-  useEffect(() => {
-    setFinalTotal(cart.withCommision);
-  }, [cheapDelivery, fastDelivery, address, deliveryCharge, cart.withCommision]);
+  /** Grand total = cart (with commission) + selected delivery. No useEffect — avoids overwriting after radio change. */
+  const orderTotal = useMemo(() => {
+    const base = Number(cart.withCommision) || 0;
+    const delivery =
+      deliveryCharge !== undefined && deliveryCharge !== null
+        ? Number(deliveryCharge)
+        : 0;
+    return Math.round((base + delivery) * 100) / 100;
+  }, [cart.withCommision, deliveryCharge]);
 
   const onToken = (token) => {
     setStripeToken(token);
@@ -221,7 +227,7 @@ const Cart = () => {
           </div>
           <div className="flex justify-between font-bold text-green-900 text-xl border-t border-green-200 pt-4 mt-4">
             <span>Total:</span>
-            <span>LKR {finalTotal || cart.withCommision}</span>
+            <span>LKR {orderTotal}</span>
           </div>
         </div>
 
@@ -229,8 +235,8 @@ const Cart = () => {
         <div className="mt-10 flex flex-col md:flex-row gap-6 justify-center">
           <StripeCheckout
             name="Pay Food @ Door "
-            description={`Your total is LKR${cart.total}`}
-            amount={cart.total * 100}
+            description={`Your total is LKR ${orderTotal}`}
+            amount={Math.round(orderTotal * 100)}
             token={onToken}
             stripeKey={KEY}
           >
@@ -239,7 +245,10 @@ const Cart = () => {
             </button>
           </StripeCheckout>
           <button
-            onClick={() => navigate("/dummyPayment")}
+            type="button"
+            onClick={() =>
+              navigate("/dummyPayment", { state: { orderTotal } })
+            }
             className="bg-gradient-to-r from-yellow-400 to-yellow-500 text-green-900 px-8 py-3 rounded-full font-bold shadow hover:scale-105 hover:from-yellow-500 hover:to-yellow-600 transition text-lg flex items-center gap-2"
           >
             <MdFastfood /> Checkout with Dummy

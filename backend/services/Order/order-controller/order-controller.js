@@ -1,10 +1,10 @@
 const Order = require("../model/order");
-const axios = require("axios");
+const axios = require("axios"); // used by updateOrder (delivery) etc.
 
 const Key = process.env.STRIPE_SECRET_KEY;
 const stripe = require("stripe")(Key);
 
-// ✅ CREATE ORDER + CALL PAYMENT SERVICE
+// ✅ CREATE ORDER (payment is done separately with orderId in payment service body)
 const addOrder = async (req, res) => {
   try {
     const order = new Order({
@@ -15,24 +15,6 @@ const addOrder = async (req, res) => {
     });
 
     await order.save();
-
-    // 🔥 CALL PAYMENT SERVICE
-    try {
-      await axios.post(
-        "http://localhost:8500/payment/card",
-        {
-          tokenId: "tok_visa",
-          amount: order.amount,
-        },
-        {
-          headers: {
-            Authorization: req.headers.authorization || "",
-          },
-        }
-      );
-    } catch (err) {
-      console.error("Payment error:", err.response?.data || err.message);
-    }
     return res.status(201).json(order);
 
   } catch (err) {
