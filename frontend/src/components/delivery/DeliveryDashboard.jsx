@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { MdDeliveryDining, MdFastfood, MdPendingActions } from 'react-icons/md';
-import { FaUser, FaRupeeSign } from 'react-icons/fa';
+import { FaUser } from 'react-icons/fa';
 
 axios.defaults.withCredentials = true;
 

@@ -10,7 +10,6 @@ axios.defaults.withCredentials = true;
 const Profile = () => {
 
   const [user, setUser] = useState({});
-  const [products, setProducts] = useState([]);
 
   const navigate = useNavigate();
 
@@ -36,28 +35,6 @@ const Profile = () => {
   };
 
   // ---------------------------
-  // GET SELLER PRODUCTS
-  // ---------------------------
-  const sendProductRequest = async (sellerId) => {
-
-    try {
-
-      const res = await axios.get(
-        `http://localhost:8070/products/${sellerId}/products`,
-        { withCredentials: true }
-      );
-
-      return res.data;
-
-    } catch (err) {
-
-      console.log("Product fetch error:", err);
-      return [];
-
-    }
-  };
-
-  // ---------------------------
   // INITIAL LOAD
   // ---------------------------
   useEffect(() => {
@@ -69,10 +46,6 @@ const Profile = () => {
       if (!data || !data.user) return;
 
       setUser(data.user);
-
-      const productData = await sendProductRequest(data.user._id);
-
-      setProducts(productData);
 
     };
 
@@ -127,56 +100,6 @@ const Profile = () => {
         }
       }
     });
-  };
-
-  // ---------------------------
-  // DELETE PRODUCT
-  // ---------------------------
-  const handleDelete = async (product_id) => {
-
-    const willDelete = await swal({
-      title: "Are you sure?",
-      text: "You want to delete this product?",
-      icon: "warning",
-      dangerMode: true,
-    });
-
-    if (!willDelete) return;
-
-    try {
-
-      await axios.delete(
-        `http://localhost:8070/products/deleteProduct/${product_id}`
-      );
-
-      swal({
-        title: "Product deleted",
-        icon: "success",
-        buttons: false,
-        timer: 2000,
-      });
-
-      const newList = products.filter(
-        (product) => product._id !== product_id
-      );
-
-      setProducts(newList);
-
-    } catch (err) {
-
-      console.log(err);
-      swal("Error deleting product");
-
-    }
-  };
-
-  // ---------------------------
-  // UPDATE PRODUCT
-  // ---------------------------
-  const handleUpdate = (productId) => {
-
-    navigate(`/updateProduct/${productId}`);
-
   };
 
 // ---------------------------

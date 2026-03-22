@@ -1,10 +1,19 @@
 const jwt = require("jsonwebtoken");
 
+const getJwtSecret = () => process.env.JWT_SECRET || process.env.SECRET;
+
 // ===============================
 // AUTHENTICATION MIDDLEWARE
 // ===============================
 const requireAuth = (req, res, next) => {
   try {
+    const jwtSecret = getJwtSecret();
+
+    if (!jwtSecret) {
+      return res.status(500).json({
+        message: "Auth misconfiguration"
+      });
+    }
 
     let token;
 
@@ -21,22 +30,22 @@ const requireAuth = (req, res, next) => {
     }
 
     if (!token) {
-      return res.status(403).json({
-        message: "Login required!"
+      return res.status(401).json({
+        message: "Login required"
       });
     }
 
     // Verify token
-    const decoded = jwt.verify(token, process.env.SECRET);
+    const decoded = jwt.verify(token, jwtSecret);
 
     // Attach user data
     req.userId = decoded._id;
     req.userRole = decoded.role;
 
-    next();
+    return next();
 
   } catch (err) {
-    console.error("JWT verification failed:", err);
+    console.error("JWT verification failed:", err.message);
 
     return res.status(401).json({
       message: "Invalid token"
@@ -62,7 +71,7 @@ const requireRole = (...allowedRoles) => {
     }
 
     return res.status(403).json({
-      message: "Unauthorized - Insufficient permissions"
+      message: "Forbidden"
     });
   };
 };

@@ -3,10 +3,9 @@ import ReactStars from "react-rating-stars-component";
 import axios from "axios";
 import swal from "sweetalert";
 import { useParams } from "react-router-dom";
-import { MdStarRate, MdFastfood } from "react-icons/md";
+import { MdStarRate } from "react-icons/md";
 
 const RateForm = () => {
-  const [rateType] = useState("product");
   const [rateId, setRateId] = useState("");
   const [rateValue, setRateValue] = useState(0);
   const [review, setReview] = useState("");

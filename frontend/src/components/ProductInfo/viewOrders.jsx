@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { MdRestaurant, MdDeliveryDining, MdOutlineTimer } from "react-icons/md";
-import { FaRupeeSign } from "react-icons/fa";
+import { MdRestaurant, MdOutlineTimer } from "react-icons/md";
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
 const statusOptions = [

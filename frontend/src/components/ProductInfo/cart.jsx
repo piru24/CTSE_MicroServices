@@ -74,29 +74,6 @@ const Cart = () => {
     stripeToken && makeRequest();
   }, [stripeToken, cart.total]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const orderData = {
-      products: cart.products.map((product) => ({
-        productId: product._id,
-        name: product.name,
-        quantity: product.quantity,
-      })),
-      amount: cart.withCommision,
-      status: "pending",
-    };
-    try {
-      const res = await axios.post(
-        "http://localhost:8020/order/addOrder",
-        orderData
-      );
-      console.log(orderData);
-      console.log(res.data);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-200 py-12">
       <div className="container mx-auto px-4">

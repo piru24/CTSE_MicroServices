@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { authActions } from "../Store";
 import axios from "axios";
-import validators from "../../utils/validators";
 import InputField from "../ui/InputField";
 import Loader from "../Loader";
 import { Link } from "react-router-dom";

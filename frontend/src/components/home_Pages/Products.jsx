@@ -50,7 +50,7 @@ const Products = () => {
       getProducts();
     }
 
-  }, [isLoggedIn]);
+  }, [isLoggedIn, token]);
 
   const filteredProducts = products.filter((product) =>
     product.name.toLowerCase().includes(searchQuery.toLowerCase())

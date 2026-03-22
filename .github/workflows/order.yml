@@ -1,0 +1,106 @@
+name: Order Service CI/CD
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "backend/services/Order/**"
+      - ".github/workflows/order.yml"
+  pull_request:
+    paths:
+      - "backend/services/Order/**"
+      - ".github/workflows/order.yml"
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  quality-build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend/services/Order
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint check
+        run: npm run lint --if-present
+
+      - name: Test
+        run: npm test --if-present
+
+      - name: Security audit
+        run: npm audit --audit-level=high || true
+
+      - name: Build Docker image
+        run: docker build -t order-service:${{ github.sha }} .
+
+      - name: Generate deployment handoff metadata
+        run: |
+          echo "IMAGE_TAG=${{ github.sha }}" > deployment-info.env
+          echo "SERVICE_NAME=order-service" >> deployment-info.env
+          echo "PORT=8020" >> deployment-info.env
+
+      - name: Upload deployment handoff metadata
+        uses: actions/upload-artifact@v4
+        with:
+          name: order-service-deployment-info
+          path: backend/services/Order/deployment-info.env
+
+  docker-publish:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: quality-build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Docker login
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push image
+        run: |
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/order-service:latest ./backend/services/Order
+          docker tag ${{ secrets.DOCKER_USERNAME }}/order-service:latest ${{ secrets.DOCKER_USERNAME }}/order-service:${{ github.sha }}
+          docker push ${{ secrets.DOCKER_USERNAME }}/order-service:latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/order-service:${{ github.sha }}
+
+  sonarcloud:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: quality-build
+    runs-on: ubuntu-latest
+    env:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+    steps:
+      - name: Checkout repository
+        if: ${{ env.SONAR_TOKEN != '' }}
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: SonarCloud Scan
+        if: ${{ env.SONAR_TOKEN != '' }}
+        uses: SonarSource/sonarqube-scan-action@v5
+        with:
+          projectBaseDir: backend/services/Order
+        env:
+          SONAR_TOKEN: ${{ env.SONAR_TOKEN }}
+          SONAR_HOST_URL: https://sonarcloud.io

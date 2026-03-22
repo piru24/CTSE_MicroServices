@@ -15,7 +15,6 @@ import {
   CircularProgress,
   LinearProgress,
   Chip,
-  Divider,
 } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';

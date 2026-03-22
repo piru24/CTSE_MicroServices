@@ -15,6 +15,20 @@ spec:
       containers:
         - name: order-service
           image: it22358820/order-service
+          ports:
+            - containerPort: 8020
+          livenessProbe:
+            httpGet:
+              path: /order/health
+              port: 8020
+            initialDelaySeconds: 20
+            periodSeconds: 15
+          readinessProbe:
+            httpGet:
+              path: /order/ready
+              port: 8020
+            initialDelaySeconds: 10
+            periodSeconds: 10
           resources:
             limits:
               cpu: "500m"
