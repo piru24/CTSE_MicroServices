@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+
 const requireAuth = (req, res, next) => {
 
   let token = null;
@@ -31,11 +32,19 @@ const requireAuth = (req, res, next) => {
     }
 
     req.userId = decodedToken._id;
-    req.userRole = decodedToken.role;
+
+    // 🔥 FIX: normalize role here
+    req.userRole = decodedToken.role?.toLowerCase();
+
+    // 🔍 DEBUG (IMPORTANT)
+    console.log("ROLE FROM TOKEN:", req.userRole);
 
     next();
   });
 };
+
+
+// 🔥 ALSO FIX ROLE CHECKS (safe version)
 
 const requireRoleSeller = (req, res, next) => {
   if (req.userRole === "seller") {
@@ -58,6 +67,14 @@ const requireRoleBuyer = (req, res, next) => {
   return res.status(403).json({ message: "Unauthorized - Buyer only" });
 };
 
+// 🔥 ADD THIS (you were missing it)
+const requireRoleBuyerOrSeller = (req, res, next) => {
+  if (req.userRole === "buyer" || req.userRole === "seller") {
+    return next();
+  }
+  return res.status(403).json({ message: "Unauthorized - Buyer or Seller only" });
+};
+
 const requireRoleDelivery = (req, res, next) => {
   if (req.userRole === "delivery") {
     return next();
@@ -65,8 +82,10 @@ const requireRoleDelivery = (req, res, next) => {
   return res.status(403).json({ message: "Unauthorized - Delivery only" });
 };
 
-exports.requireAuth = requireAuth
+
+exports.requireAuth = requireAuth;
 exports.requireRoleSeller = requireRoleSeller;
 exports.requireRoleAdmin = requireRoleAdmin;
 exports.requireRoleBuyer = requireRoleBuyer;
+exports.requireRoleBuyerOrSeller = requireRoleBuyerOrSeller; // 🔥 IMPORTANT
 exports.requireRoleDelivery = requireRoleDelivery;

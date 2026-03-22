@@ -12,70 +12,55 @@ const DeliveryTracking = () => {
   const [status, setStatus] = useState(orderDetails?.status || '');
 
   const handleStartDelivery = async () => {
-    if (!orderDetails?._id) return;
-    
+  if (!orderDetails?.orderId) return;
 
-    try {
-      const response = await axios.put(
-        `http://localhost:8020/order/updateOrder/${orderDetails._id}`,
-        { status: 'on the way' }
-      );
-      
-      setStatus(response.data.status);
-      alert('Delivery started! Customer has been notified.');
-      
-      // You can add additional logic here to notify the customer
-    } catch (error) {
-      console.error('Error starting delivery:', error);
-      alert('Failed to start delivery');
-    } finally {
-    
-    }
-  };
+  try {
+    await axios.post("http://localhost:8300/delivery/start", {
+      orderId: orderDetails.orderId
+    });
+
+    setStatus("on the way");
+    alert("Delivery started!");
+
+  } catch (error) {
+    console.error(error);
+    alert("Failed to start delivery");
+  }
+};
 
   const handleDoorDelivery = async () => {
-    if (!orderDetails?._id) return;
-    
+  if (!orderDetails?.orderId) return;
 
-    try {
-      const response = await axios.put(
-        `http://localhost:8020/order/updateOrder/${orderDetails._id}`,
-        { status: 'arrived' }
-      );
-      
-      setStatus(response.data.status);
-      alert('Delivery arrived! Customer has been notified.');
-      
-      // You can add additional logic here to notify the customer
-    } catch (error) {
-      console.error('Error ending delivery:', error);
-      alert('Failed to end delivery');
-    } finally {
-    
-    }
-  };
+  try {
+    await axios.post("http://localhost:8300/delivery/arrived", {
+      orderId: orderDetails.orderId
+    });
+
+    setStatus("arrived");
+    alert("Delivery arrived!");
+
+  } catch (error) {
+    console.error(error);
+    alert("Failed to update delivery");
+  }
+};
 
   const handleEndDelivery = async () => {
-    if (!orderDetails?._id) return;
-    
+  if (!orderDetails?.orderId) return;
 
-    try {
-      const response = await axios.put(
-        `http://localhost:8020/order/updateOrder/${orderDetails._id}`,
-        { status: 'completed' }
-      );
-      
-      setStatus(response.data.status);
-      alert('Delivery completed! Customer has been notified.');
-      
-      // You can add additional logic here to notify the customer
-    } catch (error) {
-      console.error('Error ending delivery:', error);
-      alert('Failed to end delivery');
-    } finally {
-    
-    }
-  };
+  try {
+    await axios.post("http://localhost:8300/delivery/complete", {
+      orderId: orderDetails.orderId
+    });
+
+    setStatus("completed");
+    alert("Delivery completed!");
+
+  } catch (error) {
+    console.error(error);
+    alert("Failed to complete delivery");
+  }
+};
 
 
   useEffect(() => {
@@ -110,7 +95,7 @@ return (
           </div>
 
           <h2 className="text-3xl font-bold text-gray-900">
-            Order Delivery Details
+            Delivery Details
           </h2>
         </div>
 
@@ -121,7 +106,7 @@ return (
 
             <h3 className="text-xl font-semibold text-gray-800 flex items-center gap-2">
               <MdFastfood className="text-[#f7941d]" />
-              Order #{orderDetails._id.slice(-6).toUpperCase()}
+              Order #{orderDetails?._id?.slice(-6) || "N/A"}
             </h3>
 
             <span className={`px-4 py-1 rounded-full text-sm font-medium ${statusColors[status.toLowerCase()]}`}>

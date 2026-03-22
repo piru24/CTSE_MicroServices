@@ -5,13 +5,15 @@ const requireAccess  = require("../middlewares")
 
 router.use(requireAccess.requireAuth)
 
-router.post("/addProduct", requireAccess.requireAuth, requireAccess.requireRoleSeller, productController.addProduct);
-router.get("/getProducts", requireAccess.requireAuth, requireAccess.requireRoleBuyer, productController.getAllProducts);
-router.get("/getProduct/:id",requireAccess.requireAuth, requireAccess.requireRoleBuyerOrSeller, productController.getById);
-router.put("/updateProduct/:id",requireAccess.requireAuth, requireAccess.requireRoleSeller, productController.updateProduct);
-router.delete("/deleteProduct/:id",requireAccess.requireAuth, requireAccess.requireRoleSeller, productController.deleteProduct);
-router.get("/search/", requireAccess.requireAuth, requireAccess.requireRoleBuyer, productController.getSearch)
-router.get("/:sellerId/products", requireAccess.requireAuth, requireAccess.requireRoleSeller, productController.getBySellerId)
+router.use(requireAccess.requireAuth);
+
+router.post("/addProduct", requireAccess.requireRoleSeller, productController.addProduct);
+router.get("/getProducts", requireAccess.requireRoleBuyer, productController.getAllProducts);
+router.get("/getProduct/:id", requireAccess.requireRoleBuyerOrSeller, productController.getById);
+router.put("/updateProduct/:id", requireAccess.requireRoleSeller, productController.updateProduct);
+router.delete("/deleteProduct/:id", requireAccess.requireRoleSeller, productController.deleteProduct);
+router.get("/search/", requireAccess.requireRoleBuyer, productController.getSearch);
+router.get("/:sellerId/products", requireAccess.requireRoleSeller, productController.getBySellerId);
 
 
 module.exports = router;

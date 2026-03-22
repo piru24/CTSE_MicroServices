@@ -51,8 +51,8 @@ const staticProducts = [
 ];
 
 const Home = () => {
-
-  const { isLoggedIn, token } = useSelector((state) => state.auth);
+const token = localStorage.getItem("token");
+const isLoggedIn = !!token;
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
@@ -69,18 +69,20 @@ const Home = () => {
 
         if (isLoggedIn) {
 
-          const res = await axios.get(
-            "http://localhost:8070/products/getProducts",
-            {
-              headers: { Authorization: `Bearer ${token}` },
-              withCredentials: true
-            }
-          );
+  const storedToken = localStorage.getItem("token");
 
-          fetched = res.data;
+  const res = await axios.get(
+    "http://localhost:8070/products/getProducts",
+    {
+      headers: {
+        Authorization: `Bearer ${storedToken}`
+      },
+      withCredentials: true
+    }
+  );
 
-        }
-
+  fetched = res.data;
+}
         const combined = [...staticProducts, ...fetched];
 
         setProducts(combined);

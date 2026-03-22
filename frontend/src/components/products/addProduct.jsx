@@ -32,10 +32,21 @@ export default function AddProducts() {
 
   const addProducts = (e) => {
     e.preventDefault();
-    axios
-      .post("http://localhost:8070/products/addProduct", products, { withCredentials: true, headers: {
-      Authorization: `Bearer ${token}`
-    } })
+   const token = localStorage.getItem("token");
+
+    if (!token) {
+    return swal.fire({
+      title: "Not logged in",
+      text: "Please login first",
+      icon: "warning"
+    });
+  }
+    axios.post("http://localhost:8070/products/addProduct", products, {
+      withCredentials: true,
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
       .then(() => {
         swal.fire({
           title: "Product added successfully!",

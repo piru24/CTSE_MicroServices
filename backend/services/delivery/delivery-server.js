@@ -2,39 +2,35 @@ require('dotenv').config();
 
 const express = require("express");
 const mongoose = require("mongoose");
-const bodyParser = require("body-parser");
 const cors = require("cors");
 
 const deliveryRouter = require("./routes/delivery-routes");
-const { startDeliveryConsumer } = require("./services/rabbitmq");
 
 const app = express();
-
 const PORT = process.env.PORT || 8300;
 
+// Middleware
 app.use(cors({
-  origin:"http://localhost:3000",
-  credentials:true
+  origin: "http://localhost:3000",
+  credentials: true
 }));
 
-app.use(bodyParser.json());
+app.use(express.json());
 
+// Routes
 app.use("/delivery", deliveryRouter);
 
-// MongoDB
+// MongoDB Connection
 mongoose.connect(process.env.MONGO_URI)
-.then(()=>{
-
+.then(() => {
   console.log("MongoDB Connected (Delivery Service)");
 
-  // start rabbitmq consumer
-  startDeliveryConsumer();
 
-  app.listen(PORT,()=>{
+  app.listen(PORT, () => {
     console.log(`🚚 Delivery Service running on port ${PORT}`);
   });
 
 })
-.catch(err=>{
-  console.error("MongoDB connection error:",err);
+.catch(err => {
+  console.error("MongoDB connection error:", err);
 });

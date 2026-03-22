@@ -15,7 +15,7 @@ const DeliveryDashboard = () => {
   useEffect(() => {
     const getOrders = async () => {
       try {
-        const res = await axios.get(`http://localhost:8020/order/dispatchedOrders`);
+        const res = await axios.get(`http://localhost:8300/delivery`);
         setOrders(res.data);
       } catch (err) {
         console.error("Error fetching dispatched orders", err);
@@ -110,15 +110,7 @@ const DeliveryDashboard = () => {
                     <MdFastfood className="text-[#f7941d]" />
 
                     <span className="font-mono text-gray-800">
-                      {order.userId.slice(-8).toUpperCase()}
-                    </span>
-                  </div>
-
-                  {/* Amount */}
-                  <div className="flex items-center gap-2">
-                    LKR
-                    <span className="text-gray-900 font-bold">
-                      {order.amount?.toFixed(2) || "0.00"}
+                      {order.userId ? order.userId.slice(-8).toUpperCase() : "N/A"}
                     </span>
                   </div>
 

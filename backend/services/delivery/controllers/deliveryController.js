@@ -21,9 +21,17 @@ const pingDeliveryServer = async (req, res, next) => {
 };
 exports.pingDeliveryServer = pingDeliveryServer;
 
+const getAllDeliveries = async (req, res) => {
+  try {
+    const deliveries = await Delivery.find();
+    res.status(200).json(deliveries);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to fetch deliveries" });
+  }
+};
 
-
-
+exports.getAllDeliveries = getAllDeliveries; 
 
 // Get Rates
 const getRate = async(req, res, next) => {
@@ -144,31 +152,106 @@ async function getDistanceDuration(location1, location2){
   }
 }
 
-//
-// Accept Delivery
 const acceptDelivery = async (req, res) => {
-  const { orderId } = req.body;
-  const driverId = req.user?.id || "64fe5b1234567890abcd1234"; // Replace with req.user.id if you use Auth
-
   try {
-    const alreadyAccepted = await AcceptedDelivery.findOne({ orderId });
-    if (alreadyAccepted) {
-      return res.status(400).json({ message: "This order has already been accepted." });
+    const { orderId } = req.body;
+    const driverId = req.user?.id || "64fe5b1234567890abcd1234";
+
+    const delivery = await Delivery.findOne({ orderId });
+
+    if (!delivery) {
+      return res.status(404).json({ message: "Delivery not found" });
     }
 
-    const newAccepted = new AcceptedDelivery({
-      orderId,
-      driverId,
-      status: "On the way"
-    });
+    if (delivery.driverId) {
+      return res.status(400).json({ message: "Already assigned" });
+    }
 
-    await newAccepted.save();
+    delivery.driverId = driverId;
+    delivery.status = "accepted";
 
-    return res.status(200).json({ message: "Order accepted successfully", accepted: newAccepted });
+    await delivery.save();
+
+    res.status(200).json({ message: "Delivery accepted", delivery });
+
   } catch (err) {
     console.error("Accept Error:", err);
-    return res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
+const createDelivery = async (req, res) => {
+  try {
+    const { orderId, userId, products } = req.body;
+
+    console.log("CREATING DELIVERY:", orderId);
+
+    const delivery = new Delivery({
+      orderId,
+      userId,
+      products,
+      status: "pending"
+    });
+
+    await delivery.save();
+
+    res.status(201).json(delivery);
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Delivery creation failed" });
+  }
+};
+exports.createDelivery = createDelivery;
 exports.acceptDelivery = acceptDelivery;
+
+const startDelivery = async (req, res) => {
+  try {
+    const { orderId } = req.body;
+
+    const delivery = await Delivery.findOne({ orderId });
+
+    if (!delivery) return res.status(404).json({ message: "Not found" });
+
+    delivery.status = "on the way";
+    await delivery.save();
+
+    res.json(delivery);
+  } catch (err) {
+    res.status(500).json({ message: "Error" });
+  }
+};
+
+const markArrived = async (req, res) => {
+  try {
+    const { orderId } = req.body;
+
+    const delivery = await Delivery.findOne({ orderId });
+
+    delivery.status = "arrived";
+    await delivery.save();
+
+    res.json(delivery);
+  } catch (err) {
+    res.status(500).json({ message: "Error" });
+  }
+};
+
+const completeDelivery = async (req, res) => {
+  try {
+    const { orderId } = req.body;
+
+    const delivery = await Delivery.findOne({ orderId });
+
+    delivery.status = "completed";
+    await delivery.save();
+
+    res.json(delivery);
+  } catch (err) {
+    res.status(500).json({ message: "Error" });
+  }
+};
+
+exports.startDelivery = startDelivery;
+exports.markArrived = markArrived;
+exports.completeDelivery = completeDelivery;

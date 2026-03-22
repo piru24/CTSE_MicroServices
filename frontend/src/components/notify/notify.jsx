@@ -15,8 +15,8 @@ import {
   CircularProgress,
   LinearProgress,
   Chip,
-  Divider,
 } from '@mui/material';
+
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import PaymentIcon from '@mui/icons-material/Payment';
@@ -27,7 +27,9 @@ import RestaurantMenuIcon from '@mui/icons-material/RestaurantMenu';
 const Notify = () => {
   const { orderId } = useParams();
   const navigate = useNavigate();
+
   const [order, setOrder] = useState(null);
+  const [deliveryStatus, setDeliveryStatus] = useState(null); // 🔥 added
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -35,15 +37,29 @@ const Notify = () => {
     const fetchOrderDetails = async () => {
       try {
         setLoading(true);
+
+        // ✅ ORDER
         const res = await axios.get(
           `http://localhost:8020/order/getOrder/${orderId}`,
           { withCredentials: true }
         );
+
+        // ✅ DELIVERY
+        const deliveryRes = await axios.get(
+          `http://localhost:8300/delivery`
+        );
+
+        const delivery = deliveryRes.data.find(
+          d => d.orderId === orderId
+        );
+
         if (res.data) {
           setOrder(res.data);
+          setDeliveryStatus(delivery?.status || res.data.status); // 🔥 FIX
         } else {
           setError('Order not found');
         }
+
       } catch (err) {
         setError(err.response?.data?.message || 'Failed to load order details');
       } finally {
@@ -51,12 +67,7 @@ const Notify = () => {
       }
     };
 
-    if (orderId) {
-      fetchOrderDetails();
-    } else {
-      setError('Order ID is missing');
-      setLoading(false);
-    }
+    fetchOrderDetails();
   }, [orderId]);
 
   const statusSteps = [
@@ -69,258 +80,152 @@ const Notify = () => {
   ];
 
   const getActiveStep = () => {
-    if (!order) return 0;
-    const index = statusSteps.findIndex(step => step.value === order.status);
+    if (!deliveryStatus) return 0;
+    const index = statusSteps.findIndex(step => step.value === deliveryStatus);
     return index >= 0 ? index : 0;
   };
 
   const getProgressValue = () => {
-    const activeStep = getActiveStep();
-    return (activeStep / (statusSteps.length - 1)) * 100;
+    return (getActiveStep() / (statusSteps.length - 1)) * 100;
   };
 
+  // LOADING
   if (loading) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="60vh">
-        <CircularProgress size={60} thickness={5} color="success" />
-      </Box>
+      <div className="min-h-screen flex items-center justify-center">
+        <CircularProgress size={60} color="success" />
+      </div>
     );
   }
 
+  // ERROR
   if (error) {
     return (
-      <Paper elevation={3} sx={{ padding: 3, margin: 3, textAlign: 'center', background: '#fff8f0' }}>
-        <Typography color="error" fontWeight="bold">{error}</Typography>
-        <Button
-          variant="contained"
-          onClick={() => navigate(-1)}
-          sx={{ marginTop: 3, background: 'linear-gradient(90deg, #43e97b 0%, #38f9d7 100%)' }}
-        >
-          Back to Orders
-        </Button>
-      </Paper>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="bg-white p-6 rounded-xl shadow-lg">
+          <Typography color="error">{error}</Typography>
+          <Button onClick={() => navigate(-1)} sx={{ mt: 2 }}>
+            Back
+          </Button>
+        </div>
+      </div>
     );
   }
 
-  if (!order) {
-    return (
-      <Paper elevation={3} sx={{ padding: 3, margin: 3, textAlign: 'center' }}>
-        <Typography>No order details available</Typography>
-        <Button
-          variant="contained"
-          onClick={() => navigate('/order-history')}
-          sx={{ marginTop: 3 }}
-        >
-          Back to Order History
-        </Button>
-      </Paper>
-    );
-  }
+  if (!order) return null;
 
   return (
-    <Paper
-      elevation={3}
-      sx={{
-        margin: { xs: 1, md: 3 },
-        padding: { xs: 2, md: 4 },
-        background: 'linear-gradient(135deg,rgb(141, 206, 84) 0%,rgb(29, 107, 55) 100%)',
-        borderRadius: 4,
-        boxShadow: 6,
-      }}
-    >
-      {/* Header */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#43e97b', display: 'flex', alignItems: 'center', gap: 1 }}>
-          <RestaurantMenuIcon fontSize="large" sx={{ color: '#43e97b' }} />
-          Order Tracking
-        </Typography>
-        <Button
-          variant="outlined"
-          onClick={() => navigate(-1)}
-          sx={{
-            borderColor: '#43e97b',
-            color: '#256029',
-            fontWeight: 'bold',
-            '&:hover': { borderColor: '#43e97b', background: '#e6ffe6' }
-          }}
-        >
-          Back
-        </Button>
-      </Box>
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-200 p-8">
+      <div className="max-w-5xl mx-auto">
 
-      {/* Progress Bar */}
-      <Box sx={{ width: '100%', mb: 4 }}>
-        <LinearProgress
-          variant="determinate"
-          value={getProgressValue()}
-          sx={{
-            height: 12,
-            borderRadius: 6,
-            backgroundColor: '#e0f7fa',
-            '& .MuiLinearProgress-bar': {
-              borderRadius: 6,
-              background: 'linear-gradient(90deg, #43e97b 0%, #38f9d7 100%)'
-            }
-          }}
-        />
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 1 }}>
-          {statusSteps.map((step, index) => (
-            <Box
-              key={step.label}
-              sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                width: `${100 / statusSteps.length}%`
-              }}
+        <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-200">
+
+          {/* HEADER */}
+          <div className="flex items-center justify-between mb-8">
+
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-[#f7941d] rounded-full text-white">
+                <RestaurantMenuIcon />
+              </div>
+
+              <h1 className="text-3xl font-bold text-gray-900">
+                Order Tracking
+              </h1>
+            </div>
+
+            <button
+              onClick={() => navigate(-1)}
+              className="bg-gray-100 px-4 py-2 rounded-full font-semibold text-gray-700 hover:bg-gray-200"
             >
-              <Box
-                sx={{
-                  width: 32,
-                  height: 32,
-                  borderRadius: '50%',
-                  background: index <= getActiveStep() ? 'linear-gradient(90deg, #43e97b 0%, #38f9d7 100%)' : '#e0e0e0',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: index <= getActiveStep() ? 'white' : 'grey.400',
-                  mb: 1,
-                  boxShadow: index === getActiveStep() ? 4 : 1,
-                }}
-              >
-                {React.cloneElement(step.icon, { fontSize: 'small' })}
-              </Box>
-              <Typography
-                variant="caption"
-                sx={{
-                  textAlign: 'center',
-                  fontWeight: index === getActiveStep() ? 'bold' : 'normal',
-                  color: index <= getActiveStep() ? '#256029' : 'text.secondary'
-                }}
-              >
-                {step.label}
-              </Typography>
-              {index === getActiveStep() && (
-                <Chip
-                  label="Current"
-                  color="success"
-                  size="small"
-                  sx={{ mt: 0.5, fontWeight: 'bold' }}
-                />
-              )}
-            </Box>
-          ))}
-        </Box>
-      </Box>
+              Back
+            </button>
+          </div>
 
-      {/* Order Summary */}
-      <Box sx={{ mb: 4, p: 2, backgroundColor: '#f9fbe7', borderRadius: 2 }}>
-        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
-          <Box sx={{ flex: 1, minWidth: 200 }}>
-            <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: '#388e3c' }}>Order ID:</Typography>
-            <Typography>{order._id}</Typography>
-          </Box>
-          <Box sx={{ flex: 1, minWidth: 200 }}>
-            <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: '#388e3c' }}>Order Date:</Typography>
-            <Typography>{new Date(order.createdAt).toLocaleString()}</Typography>
-          </Box>
-          <Box sx={{ flex: 1, minWidth: 200 }}>
-            <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: '#388e3c' }}>Status:</Typography>
-            <Typography
-              sx={{
-                color: order.status === 'delivered' ? 'success.main' :
-                  order.status === 'cancelled' ? 'error.main' : 'warning.main',
-                fontWeight: 'bold'
-              }}
-            >
-              {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-            </Typography>
-          </Box>
-          <Box sx={{ flex: 1, minWidth: 200 }}>
-            <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: '#388e3c' }}>Total Amount:</Typography>
-            <Typography>₹{order.amount.toFixed(2)}</Typography>
-          </Box>
-        </Box>
-      </Box>
+          {/* PROGRESS BAR */}
+          <LinearProgress
+            variant="determinate"
+            value={getProgressValue()}
+            sx={{ height: 10, borderRadius: 5, mb: 4 }}
+          />
 
-      {/* Products Table */}
-      <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold', color: '#256029' }}>Order Items</Typography>
-      <TableContainer component={Paper} sx={{ mb: 4, borderRadius: 2, background: '#f8fff6' }}>
-        <Table>
-          <TableHead sx={{ backgroundColor: '#e0f2f1' }}>
-            <TableRow>
-              <TableCell sx={{ fontWeight: 'bold', color: '#388e3c' }}>Product</TableCell>
-              <TableCell align="right" sx={{ fontWeight: 'bold', color: '#388e3c' }}>Quantity</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {order.products.map((product, index) => (
-              <TableRow key={index}>
-                <TableCell>{product.name}</TableCell>
-                <TableCell align="right">{product.quantity}</TableCell>
-              </TableRow>
+          {/* STEPS */}
+          <div className="flex justify-between mb-8">
+            {statusSteps.map((step, i) => (
+              <div key={i} className="text-center">
+
+                <div
+                  className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                    i <= getActiveStep()
+                      ? "bg-green-500 text-white"
+                      : "bg-gray-300 text-gray-500"
+                  }`}
+                >
+                  {step.icon}
+                </div>
+
+                <p className="text-sm mt-2">{step.label}</p>
+
+                {i === getActiveStep() && (
+                  <span className="text-xs bg-green-100 px-2 py-1 rounded-full">
+                    Current
+                  </span>
+                )}
+              </div>
             ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+          </div>
 
-      {/* Status-specific Information */}
-      {order.status !== 'cancelled' && order.status !== 'delivered' && (
-        <Box sx={{
-          mt: 4,
-          p: 3,
-          backgroundColor: '#e3f2fd',
-          borderRadius: 2,
-          borderLeft: '4px solid #1976d2'
-        }}>
-          <Typography variant="h6" sx={{ mb: 1, fontWeight: 'bold', color: '#1976d2' }}>
-            Order Status Update
-          </Typography>
-          <Typography>
-            {order.status === 'pending' && 'Your order has been received and is being prepared for processing.'}
-            {order.status === 'processing' && 'We are currently processing your order and preparing it for delivery.'}
-            {order.status === 'dispatched' && 'Your order has been dispatched and is on its way to you!'}
-            {order.status === 'on the way' && 'Your order is on its way to you!'}
-            {order.status === 'arrived' && 'Driver reached. Pickup your order!'}
-            {order.status === 'completed' && 'Your order has been delivered. Thank you!'}
-          </Typography>
-        </Box>
-      )}
+          {/* SUMMARY */}
+          <div className="grid md:grid-cols-4 gap-4 mb-6 bg-gray-50 p-4 rounded-xl">
 
-      {order.status === 'delivered' && (
-        <Box sx={{
-          mt: 4,
-          p: 3,
-          backgroundColor: '#e8f5e9',
-          borderRadius: 2,
-          borderLeft: '4px solid #4caf50'
-        }}>
-          <Typography variant="h6" sx={{ mb: 1, fontWeight: 'bold', color: '#388e3c' }}>
-            Delivery Successful
-          </Typography>
-          <Typography>
-            Your order was successfully delivered on {new Date(order.updatedAt).toLocaleDateString()}.
-          </Typography>
-        </Box>
-      )}
+            <div>
+              <p className="text-sm text-gray-500">Order ID</p>
+              <p className="font-semibold">{order._id}</p>
+            </div>
 
-      {order.status === 'cancelled' && (
-        <Box sx={{
-          mt: 4,
-          p: 3,
-          backgroundColor: '#ffebee',
-          borderRadius: 2,
-          borderLeft: '4px solid #f44336'
-        }}>
-          <Typography variant="h6" sx={{ mb: 1, fontWeight: 'bold', color: '#d32f2f' }}>
-            Order Cancelled
-          </Typography>
-          <Typography>
-            This order was cancelled on {new Date(order.updatedAt).toLocaleDateString()}.
-          </Typography>
-        </Box>
-      )}
-    </Paper>
+            <div>
+              <p className="text-sm text-gray-500">Date</p>
+              <p>{new Date(order.createdAt).toLocaleString()}</p>
+            </div>
+
+            <div>
+              <p className="text-sm text-gray-500">Status</p>
+              <p className="font-bold text-orange-600">
+                {deliveryStatus?.charAt(0).toUpperCase() + deliveryStatus?.slice(1)}
+              </p>
+            </div>
+
+            <div>
+              <p className="text-sm text-gray-500">Amount</p>
+              <p className="font-semibold">₹{order.amount}</p>
+            </div>
+
+          </div>
+
+          {/* PRODUCTS */}
+          <h3 className="font-bold mb-3">Order Items</h3>
+
+          <div className="space-y-2">
+            {order.products?.map((p, i) => (
+              <div key={i} className="flex justify-between bg-gray-50 p-3 rounded-lg">
+                <span>{p.name}</span>
+                <span>Qty: {p.quantity}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* STATUS MESSAGE */}
+          <div className="mt-6 bg-blue-50 p-4 rounded-lg">
+
+            {deliveryStatus === 'dispatched' && "Your order has been dispatched 🚚"}
+            {deliveryStatus === 'on the way' && "Driver is on the way 🚚"}
+            {deliveryStatus === 'arrived' && "Driver has arrived 📍"}
+            {deliveryStatus === 'completed' && "Delivered successfully ✅"}
+
+          </div>
+
+        </div>
+      </div>
+    </div>
   );
 };
 

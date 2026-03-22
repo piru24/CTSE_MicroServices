@@ -1,11 +1,20 @@
 const mongoose = require('mongoose');
 
 const deliverySchema = new mongoose.Schema({
-
   orderId: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
     unique: true
+  },
+
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true
+  },
+
+  products: {
+    type: Array,
+    default: []
   },
 
   driverId: {
@@ -16,14 +25,13 @@ const deliverySchema = new mongoose.Schema({
 
   status: {
     type: String,
-    default: "pending"
+    default: "pending" // pending → accepted → delivered
   },
 
   createdAt: {
     type: Date,
     default: Date.now
   }
-
 });
 
 module.exports = mongoose.model('Delivery', deliverySchema);

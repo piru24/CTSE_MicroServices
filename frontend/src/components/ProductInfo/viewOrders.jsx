@@ -13,12 +13,18 @@ const statusOptions = [
 
 const ViewOrders = () => {
   const [orders, setOrders] = useState([]);
-
+  const token = localStorage.getItem("token");
   // Fetch orders
   useEffect(() => {
     const getOrders = async () => {
       try {
-        const res = await axios.get(`http://localhost:8020/order/getOrders`);
+        const res = await axios.get(`http://localhost:8020/order/getOrders`,
+           {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  }
+        );
         setOrders(res.data);
       } catch (err) {
         console.error("Error fetching orders:", err);
@@ -29,22 +35,34 @@ const ViewOrders = () => {
 
   // Update order status
   const handleUpdateState = async (orderId, newState) => {
-    try {
-      const res = await axios.put(
-        `http://localhost:8020/order/updateOrder/${orderId}`,
-        { status: newState }
+  try {
+    const token = localStorage.getItem("token");
+
+    const res = await axios.put(
+      `http://localhost:8020/order/updateOrder/${orderId}`,
+      { status: newState },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
+
+    const updatedOrder = res.data;
+
+    setOrders((prevOrders) => {
+      const newOrders = [...prevOrders];
+      const index = newOrders.findIndex(
+        (order) => order._id === updatedOrder._id
       );
-      const updatedOrder = res.data;
-      setOrders((prevOrders) => {
-        const newOrders = [...prevOrders];
-        const index = newOrders.findIndex((order) => order._id === updatedOrder._id);
-        newOrders[index] = updatedOrder;
-        return newOrders;
-      });
-    } catch (err) {
-      console.error("Error updating order status:", err);
-    }
-  };
+      newOrders[index] = updatedOrder;
+      return newOrders;
+    });
+
+  } catch (err) {
+    console.error("Error updating order status:", err);
+  }
+};
 
 return (
   <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-200 py-12">

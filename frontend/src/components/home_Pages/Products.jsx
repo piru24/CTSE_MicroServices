@@ -20,15 +20,17 @@ const Products = () => {
 
       try {
 
-        const res = await axios.get(
-          "http://localhost:8070/products/getProducts",
-          {
-            withCredentials: true,
-            headers: {
-              Authorization: `Bearer ${token}`
-            }
+    const storedToken = localStorage.getItem("token");
+
+      const res = await axios.get(
+        "http://localhost:8070/products/getProducts",
+        {
+          withCredentials: true,
+          headers: {
+            Authorization: `Bearer ${storedToken}`
           }
-        );
+        }
+      );
 
         const backendProducts = res.data.map((p) => ({
           ...p,
