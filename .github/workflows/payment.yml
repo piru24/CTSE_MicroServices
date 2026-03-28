@@ -9,8 +9,8 @@ on:
       - main
       - new-payment
     paths:
-      - 'backend/services/payment/**'
-      - '.github/workflows/payment.yml'
+      - "backend/services/payment/**"
+      - ".github/workflows/payment.yml"
 
 jobs:
   build-and-deploy:
@@ -23,7 +23,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: "18"
 
       - name: Install dependencies
         working-directory: backend/services/payment
@@ -56,5 +56,5 @@ jobs:
         uses: azure/container-apps-deploy-action@v2
         with:
           appName: payment-service
-          resourceGroup: microservices-rg2
+          resourceGroup: microservices-rg
           imageToDeploy: ${{ secrets.DOCKER_USERNAME }}/payment-service:latest
