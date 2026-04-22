@@ -12,6 +12,7 @@
     "stripe": "^12.2.0"
   },
   "scripts": {
-    "start": "nodemon order-server.js"
+    "start": "node order-server.js",
+    "dev": "nodemon order-server.js"
   }
 }

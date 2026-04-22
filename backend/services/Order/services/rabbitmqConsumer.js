@@ -1,4 +1,4 @@
-/*const Order = require("../model/order");
+const Order = require("../model/order");
 const Key = process.env.STRIPE_SECRET_KEY;
 const stripe = require("stripe")(Key);
 
@@ -112,4 +112,3 @@ exports.getOrderByBuyersId = getOrderByBuyersId;
 exports.deleteOrder = deleteOrder;
 exports.stripePay = stripePay;
 exports.getDispatchedOrders = getDispatchedOrders;
-*/

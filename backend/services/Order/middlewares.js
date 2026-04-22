@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const JWT_SECRET = process.env.JWT_SECRET || process.env.SECRET;
 
 // ===============================
 // AUTHENTICATION MIDDLEWARE
@@ -27,7 +28,7 @@ const requireAuth = (req, res, next) => {
     }
 
     // Verify token
-    const decoded = jwt.verify(token, process.env.SECRET);
+    const decoded = jwt.verify(token, JWT_SECRET);
 
     // Attach user data
     req.userId = decoded._id;
