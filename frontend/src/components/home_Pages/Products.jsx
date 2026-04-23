@@ -8,50 +8,7 @@ import { useSelector } from "react-redux";
 axios.defaults.withCredentials = true;
 
 const staticProducts = [
-  {
-    _id: 1,
-    name: "Margherita Pizza",
-    category: "pizza",
-    price: 1299.0,
-    image: "/images/pizza.jpeg",
-    description: "Pizza Palace",
-    sellerAvailable: true,
-    desc: "Classic tomato and mozzarella",
-    avgRating: 4.5,
-  },
-  {
-    _id: 2,
-    name: "Cheese Burger",
-    category: "burger",
-    price: 1900.99,
-    image: "/images/burger.jpg",
-    description: "Burger Barn",
-    sellerAvailable: true,
-    desc: "Juicy beef patty with cheese",
-    avgRating: 4.3,
-  },
-  {
-    _id: 3,
-    name: "Chapathi Thosa",
-    category: "thosa",
-    price: 100.99,
-    image: "/images/thosa.jpg",
-    description: "Thosa Kada",
-    sellerAvailable: true,
-    desc: "Soft chapathi style thosa served hot",
-    avgRating: 4.3,
-  },
-  {
-    _id: 4,
-    name: "Chicken Biryani",
-    category: "biryani",
-    price: 1399.99,
-    image: "/images/biryani.jpeg",
-    description: "Biryani House",
-    sellerAvailable: true,
-    desc: "Spicy aromatic chicken biryani",
-    avgRating: 4.7,
-  },
+
 ];
 
 const Products = () => {

@@ -4,7 +4,7 @@ async function startUserCreatedConsumer() {
 
   try {
 
-    const connection = await amqp.connect("amqp://localhost");
+    const connection = await amqp.connect("amqp://rabbitmq:5672");
 
     const channel = await connection.createChannel();
 

@@ -5,14 +5,18 @@ import { useNavigate } from "react-router-dom";
 import { FaKey, FaUserShield } from "react-icons/fa";
 import { MdOutlineFastfood } from "react-icons/md";
 
+axios.defaults.withCredentials = true;
+
+const API_BASE =
+  process.env.REACT_APP_API_BASE ||
+  "https://auth-service.agreeablestone-66d4ad90.southeastasia.azurecontainerapps.io";
+
 const UpdatePWD = () => {
   const navigate = useNavigate();
 
-  // State for both passwords
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
 
-  // (Optional) User info state
   const [user, setUser] = useState({
     name: "",
     mobile: "",
@@ -21,130 +25,122 @@ const UpdatePWD = () => {
     role: "",
   });
 
+  // ✅ AUTH HEADER HELPER
+  const getAuthConfig = () => ({
+    withCredentials: true,
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+  });
+
+  // ✅ GET USER PROFILE (FIXED)
   useEffect(() => {
     const getUser = async () => {
       try {
-        const res = await axios.get("http://localhost:8090/user/profile", {
-          withCredentials: true,
-        });
+        const res = await axios.get(
+          `${API_BASE}/user/profile`,
+          getAuthConfig()
+        );
         setUser(res.data.user || {});
       } catch (err) {
-        console.log(err);
-        swal("Error fetching user info", "", "error");
+        console.error("Profile error:", err);
+        swal("Session expired. Please login again", "", "error");
+        navigate("/");
       }
     };
-    getUser();
-  }, []);
 
+    getUser();
+  }, [navigate]);
+
+  // ✅ UPDATE PASSWORD (FIXED)
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!oldPassword || !newPassword) {
       swal("Both old and new password are required.", "", "warning");
       return;
     }
+
     try {
       await axios.patch(
-        "http://localhost:8090/user/update/pwd",
+        `${API_BASE}/user/update/pwd`,
         { oldPassword, newPassword },
-        { withCredentials: true }
+        getAuthConfig()
       );
+
       swal({
         title: "Password updated!",
         icon: "success",
-        button: "OK",
         timer: 3000,
       });
+
       navigate("/profile");
+
     } catch (err) {
-      swal("Error updating password", err.response?.data?.message || "", "error");
+      console.error("Password update error:", err);
+
+      swal(
+        "Error updating password",
+        err.response?.data?.message || "",
+        "error"
+      );
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-500 via-gray-400 to-green-700 py-12 relative">
-      <div className="container mx-auto px-4 relative z-10">
-        <div className="bg-white/90 shadow-2xl rounded-3xl p-10 max-w-lg mx-auto border border-green-100">
+    <div className="min-h-screen bg-gradient-to-br from-gray-500 via-gray-400 to-green-700 py-12">
+      <div className="container mx-auto px-4">
+
+        <div className="bg-white/90 shadow-2xl rounded-3xl p-10 max-w-lg mx-auto">
+
+          {/* HEADER */}
           <div className="flex flex-col items-center mb-8">
-            <div className="bg-gradient-to-tr from-green-400 to-green-700 rounded-full h-20 w-20 flex items-center justify-center shadow-lg border-4 border-white mb-2">
+            <div className="bg-green-600 rounded-full h-20 w-20 flex items-center justify-center mb-2">
               <FaKey className="text-white text-4xl" />
             </div>
-            <h1 className="text-3xl font-extrabold text-green-800 flex items-center gap-2">
-              <MdOutlineFastfood className="text-yellow-400" /> Update Your Password
+
+            <h1 className="text-3xl font-bold text-green-800 flex items-center gap-2">
+              <MdOutlineFastfood className="text-yellow-400" />
+              Update Password
             </h1>
           </div>
+
+          {/* FORM */}
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Old Password */}
-            <div>
-              <label
-                htmlFor="oldPassword"
-                className="block text-gray-700 font-semibold mb-2"
-              >
-                Enter Your Old Password
-              </label>
-              <input
-                type="password"
-                name="oldPassword"
-                value={oldPassword}
-                onChange={(e) => setOldPassword(e.target.value)}
-                required
-                className="w-full px-4 py-2 border border-green-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 bg-green-50"
-                placeholder="Enter old password"
-              />
-            </div>
 
-            {/* New Password */}
-            <div>
-              <label
-                htmlFor="newPassword"
-                className="block text-gray-700 font-semibold mb-2"
-              >
-                Enter Your New Password
-              </label>
-              <input
-                type="password"
-                name="newPassword"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                required
-                className="w-full px-4 py-2 border border-green-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 bg-green-50"
-                placeholder="Enter new password"
-              />
-            </div>
+            <input
+              type="password"
+              value={oldPassword}
+              onChange={(e) => setOldPassword(e.target.value)}
+              placeholder="Old Password"
+              className="w-full p-2 border rounded"
+            />
 
-            {/* Submit Button */}
-            <div>
-              <button
-                type="submit"
-                className="w-full bg-gradient-to-r from-green-500 to-green-700 text-white py-3 px-4 rounded-full font-bold shadow hover:scale-105 hover:from-green-600 hover:to-green-800 transition flex items-center justify-center gap-2 text-lg"
-              >
-                <FaUserShield /> Update Password
-              </button>
-            </div>
+            <input
+              type="password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              placeholder="New Password"
+              className="w-full p-2 border rounded"
+            />
+
+            <button
+              type="submit"
+              className="w-full bg-green-600 text-white py-3 rounded"
+            >
+              Update Password
+            </button>
           </form>
 
-          {/* User Info */}
-          <div className="mt-8">
-            <h2 className="text-xl font-bold text-green-800 mb-4 flex items-center gap-2">
-              <MdOutlineFastfood className="text-yellow-400" /> User Info
-            </h2>
-            <div className="bg-green-50 rounded-xl p-4 shadow flex flex-col gap-2">
-              <p className="text-gray-700">
-                <span className="font-semibold">Name:</span> {user.name}
-              </p>
-              <p className="text-gray-700">
-                <span className="font-semibold">Mobile:</span> {user.mobile}
-              </p>
-              <p className="text-gray-700">
-                <span className="font-semibold">Email:</span> {user.email}
-              </p>
-              <p className="text-gray-700">
-                <span className="font-semibold">Address:</span> {user.address}
-              </p>
-              <p className="text-gray-700">
-                <span className="font-semibold">Role:</span> {user.role}
-              </p>
-            </div>
+          {/* USER INFO */}
+          <div className="mt-6 bg-green-50 p-4 rounded">
+            <p><b>Name:</b> {user.name}</p>
+            <p><b>Mobile:</b> {user.mobile}</p>
+            <p><b>Email:</b> {user.email}</p>
+            <p><b>Address:</b> {user.address}</p>
+            <p><b>Role:</b> {user.role}</p>
           </div>
+
         </div>
       </div>
     </div>

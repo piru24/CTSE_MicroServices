@@ -35,7 +35,7 @@ async function startConsumer() {
         console.log("📩 Signup event received:", data);
 
         const verifyLink =
-          `http://localhost:8090/user/verify/${data.token}`;
+          `https://auth-service.agreeablestone-66d4ad90.southeastasia.azurecontainerapps.io/user/verify/${data.token}`;
 
         try {
 

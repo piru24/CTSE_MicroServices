@@ -79,7 +79,7 @@ const DeliveryTracking = () => {
 
 
   useEffect(() => {
-    axios.get(`http://localhost:8090/user/${cusid}`)
+    axios.get(`https://auth-service.agreeablestone-66d4ad90.southeastasia.azurecontainerapps.io/user/${cusid}`)
       .then(response => setUser(response.data.user))
       .catch(error => console.error('Error fetching user details:', error));
   }, []);

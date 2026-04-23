@@ -27,7 +27,7 @@ const DeliveryDashboard = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const userRes = await axios.get('http://localhost:8090/user/profile');
+        const userRes = await axios.get('https://auth-service.agreeablestone-66d4ad90.southeastasia.azurecontainerapps.io/user/profile');
         setUser(userRes.data.user);
       } catch (err) {
         console.error(err);

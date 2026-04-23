@@ -21,7 +21,7 @@ const SellerDashboard = () => {
 
       try {
         const sellerRes = await axios.get(
-          "http://localhost:8090/user/profile",
+          "https://auth-service.agreeablestone-66d4ad90.southeastasia.azurecontainerapps.io/user/profile",
           { withCredentials: true }
         );
 
@@ -47,7 +47,7 @@ const SellerDashboard = () => {
   const toggleAvailability = async () => {
     try {
       const res = await axios.put(
-        "http://localhost:8090/user/seller/availability",
+        "https://auth-service.agreeablestone-66d4ad90.southeastasia.azurecontainerapps.io/user/seller/availability",
         {
           isAvailable: !isAvailable,
         },

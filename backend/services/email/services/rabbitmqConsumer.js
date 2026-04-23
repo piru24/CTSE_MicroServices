@@ -1,5 +1,5 @@
 require("dotenv").config();
-
+//await amqp.connect("https://rabbitmq.agreeablestone-66d4ad90.southeastasia.azurecontainerapps.io");
 const amqp = require("amqplib");
 const nodemailer = require("nodemailer");
 
@@ -7,7 +7,7 @@ async function startEmailConsumer() {
 
   try {
 
-    const connection = await amqp.connect("amqp://localhost");
+    const connection = await amqp.connect("amqp://rabbitmq:5672");
 
     const channel = await connection.createChannel();
 
@@ -32,7 +32,7 @@ async function startEmailConsumer() {
       console.log("📩 Signup event received:", data);
 
       const verifyLink =
-        `http://localhost:8090/user/verify/${data.token}`;
+        `https://auth-service.agreeablestone-66d4ad90.southeastasia.azurecontainerapps.io/user/verify/${data.token}`;
 
       try {
 

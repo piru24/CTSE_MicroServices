@@ -2,13 +2,17 @@ import React, { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { authActions } from "../Store";
 import axios from "axios";
-import validators from "../../utils/validators";
 import InputField from "../ui/InputField";
 import Loader from "../Loader";
 import { Link } from "react-router-dom";
 
+// ✅ Axios global config
 axios.defaults.withCredentials = true;
-const API_BASE = process.env.REACT_APP_API_BASE || "http://localhost:8090";
+
+// ✅ API BASE
+const API_BASE =
+  process.env.REACT_APP_API_BASE ||
+  "https://auth-service.agreeablestone-66d4ad90.southeastasia.azurecontainerapps.io";
 
 const LoginModal = ({ isOpen, onClose, onSuccess }) => {
   const dispatch = useDispatch();
@@ -30,21 +34,18 @@ const LoginModal = ({ isOpen, onClose, onSuccess }) => {
     }
   }, [isOpen]);
 
+  // ✅ VALIDATION
   const validateForm = () => {
     const newErrors = {};
 
-    if (!formData.email) {
-      newErrors.email = "Email is required";
-    }
-
-    if (!formData.password) {
-      newErrors.password = "Password is required";
-    }
+    if (!formData.email) newErrors.email = "Email is required";
+    if (!formData.password) newErrors.password = "Password is required";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
+  // ✅ LOGIN HANDLER
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -54,11 +55,25 @@ const LoginModal = ({ isOpen, onClose, onSuccess }) => {
     setApiError("");
 
     try {
-      const { data } = await axios.post(`${API_BASE}/user/login`, {
-        email: formData.email.trim().toLowerCase(),
-        password: formData.password.trim(),
-      });
+      const response = await axios.post(
+        `${API_BASE}/user/login`,
+        {
+          email: formData.email.trim().toLowerCase(),
+          password: formData.password.trim(),
+        },
+        {
+          withCredentials: true, // 🔥 VERY IMPORTANT
+        }
+      );
 
+      const data = response.data;
+
+      // ✅ OPTIONAL (recommended): store token for header-based auth
+      if (data.token) {
+        localStorage.setItem("token", data.token);
+      }
+
+      // ✅ REDUX STORE
       dispatch(
         authActions.login({
           userId: data.User._id,
@@ -68,6 +83,7 @@ const LoginModal = ({ isOpen, onClose, onSuccess }) => {
       );
 
       onSuccess();
+
     } catch (err) {
       setApiError(err.response?.data?.message || "Authentication failed");
     } finally {
@@ -143,16 +159,16 @@ const LoginModal = ({ isOpen, onClose, onSuccess }) => {
             </div>
 
             {/* Register Link */}
-<p className="text-center text-gray-600 text-sm">
-  Don't have an account?{" "}
-  <Link
-    to="/signUp"
-    className="text-[#f7941d] font-semibold hover:underline"
-    onClick={onClose}
-  >
-    Register
-  </Link>
-</p>
+            <p className="text-center text-gray-600 text-sm">
+              Don't have an account?{" "}
+              <Link
+                to="/signUp"
+                className="text-[#f7941d] font-semibold hover:underline"
+                onClick={onClose}
+              >
+                Register
+              </Link>
+            </p>
 
           </form>
 

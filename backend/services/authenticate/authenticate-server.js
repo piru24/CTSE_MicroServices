@@ -6,6 +6,7 @@ const bodyParser = require("body-parser");
 const cookieParser = require('cookie-parser')
 const cors = require("cors");
 const app = express();
+app.set("trust proxy", 1); // ✅ ADD THIS LINE
 const { connectRabbitMQ } =
 require("./services/rabbitmq");
 
@@ -20,33 +21,41 @@ app.use(rateLimit({
 }));
 app.use(cookieParser())
 //declare port
-const PORT = process.env.PORT || 8090;
+const PORT = process.env.PORT || 5000;
 
 const router = require('./routes/user-routes');
 
-//using dependencies
-app.use(cors({credentials: true, origin: "http://localhost:3000"}));
+
+app.use(cors({
+  origin: ["http://localhost:3000"],
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"]
+}));
+
+// 🔥 VERY IMPORTANT
+app.options("*", cors());
 app.use(bodyParser.json());
 app.use('/user', router)
 
 
 const link="mongodb+srv://Piruthivi:Ruthi24@cluster0.nt1n9me.mongodb.net/food";
 
-mongoose.connect(link, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
- });
+mongoose.connect(link)
+  .then(async () => {
+    console.log("MongoDB Connected");
 
- 
- const connection = mongoose.connection;
-  connection.once("open", async () => {
+    // ✅ DO NOT CRASH IF RABBIT FAILS
+    try {
+      await connectRabbitMQ();
+    } catch (err) {
+      console.log("RabbitMQ not running (skipped)");
+    }
 
-  console.log("MongoDB Connection Success!");
-
-  await connectRabbitMQ();
-
-});
-
- app.listen(PORT, () => {
-     console.log(`Authentication Server is up and running on Port: ${PORT}`)
- });
+    app.listen(PORT, "0.0.0.0", () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  })
+  .catch(err => {
+    console.error("MongoDB connection failed:", err);
+  });

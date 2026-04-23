@@ -1,0 +1,83 @@
+version: "3.8"
+
+services:
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  auth-service:
+    build: ./backend/services/authenticate
+    ports:
+      - "5000:5000"
+    depends_on:
+      - rabbitmq
+    environment:
+      - RABBITMQ_URL=amqp://rabbitmq:5672
+
+  cart-service:
+    build: ./backend/services/cart
+    ports:
+      - "8051:8051"
+    depends_on:
+      - rabbitmq
+    environment:
+      - RABBITMQ_URL=amqp://rabbitmq:5672
+
+  delivery-service:
+    build: ./backend/services/delivery
+    ports:
+      - "8300:8300"
+    depends_on:
+      - rabbitmq
+    environment:
+      - RABBITMQ_URL=amqp://rabbitmq:5672
+
+  email-service:
+    build: ./backend/services/email
+    ports:
+      - "8100:8100"
+    depends_on:
+      - rabbitmq
+    environment:
+      - RABBITMQ_URL=amqp://rabbitmq:5672
+
+  order-service:
+    build: ./backend/services/Order 
+    ports:
+      - "8020:8020"
+    depends_on:
+      - rabbitmq
+    environment:
+      - RABBITMQ_URL=amqp://rabbitmq:5672
+
+  payment-service:
+    build: ./backend/services/payment 
+    ports:
+      - "8500:8500"
+    depends_on:
+      - rabbitmq
+    environment:
+      - RABBITMQ_URL=amqp://rabbitmq:5672
+
+  product-service:
+    build: ./backend/services/products
+    ports:
+      - "8070:8070"
+    depends_on:
+      - rabbitmq  
+    environment:
+      - RABBITMQ_URL=amqp://rabbitmq:5672
+
+
+  rating-service:
+    build: ./backend/services/ratings
+    ports:
+      - "8079:8079"
+    depends_on:
+      - rabbitmq
+    environment:
+      - RABBITMQ_URL=amqp://rabbitmq:5672

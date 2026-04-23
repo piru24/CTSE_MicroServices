@@ -7,7 +7,7 @@ import InputField from "../ui/InputField";
 import Loader from "../Loader";
 
 axios.defaults.withCredentials = true;
-const API_BASE = process.env.REACT_APP_API_BASE || "http://localhost:8090";
+const API_BASE = process.env.REACT_APP_API_BASE || "https://auth-service.agreeablestone-66d4ad90.southeastasia.azurecontainerapps.io";
 
 const RegisterModal = ({ isOpen, onClose, onSuccess }) => {
   const dispatch = useDispatch();
