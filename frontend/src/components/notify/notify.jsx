@@ -24,6 +24,8 @@ import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
 import HourglassTopIcon from '@mui/icons-material/HourglassTop';
 import RestaurantMenuIcon from '@mui/icons-material/RestaurantMenu';
 
+const ORDER_API = process.env.REACT_APP_ORDER_API || 'http://localhost:8020/order';
+
 const Notify = () => {
   const { orderId } = useParams();
   const navigate = useNavigate();
@@ -36,7 +38,7 @@ const Notify = () => {
       try {
         setLoading(true);
         const res = await axios.get(
-          `http://localhost:8020/order/getOrder/${orderId}`,
+          `${ORDER_API}/getOrder/${orderId}`,
           { withCredentials: true }
         );
         if (res.data) {

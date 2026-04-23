@@ -5,6 +5,7 @@ import { MdDeliveryDining, MdFastfood, MdPendingActions } from 'react-icons/md';
 import { FaUser, FaRupeeSign } from 'react-icons/fa';
 
 axios.defaults.withCredentials = true;
+const ORDER_API = process.env.REACT_APP_ORDER_API || 'http://localhost:8020/order';
 
 const DeliveryDashboard = () => {
   const navigate = useNavigate();
@@ -15,7 +16,7 @@ const DeliveryDashboard = () => {
   useEffect(() => {
     const getOrders = async () => {
       try {
-        const res = await axios.get(`http://localhost:8020/order/dispatchedOrders`);
+        const res = await axios.get(`${ORDER_API}/dispatchedOrders`);
         setOrders(res.data);
       } catch (err) {
         console.error("Error fetching dispatched orders", err);

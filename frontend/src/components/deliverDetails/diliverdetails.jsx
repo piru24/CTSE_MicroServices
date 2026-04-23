@@ -5,6 +5,8 @@ import axios from 'axios';
 import { MdDeliveryDining, MdFastfood, MdCheckCircle, MdOutlineTimer } from 'react-icons/md';
 import { FaUser, FaMapMarkerAlt, FaRupeeSign } from 'react-icons/fa';
 
+const ORDER_API = process.env.REACT_APP_ORDER_API || 'http://localhost:8020/order';
+
 const DeliveryTracking = () => {
   const [user, setUser] = useState(null);
   const location = useLocation();
@@ -17,7 +19,7 @@ const DeliveryTracking = () => {
 
     try {
       const response = await axios.put(
-        `http://localhost:8020/order/updateOrder/${orderDetails._id}`,
+        `${ORDER_API}/updateOrder/${orderDetails._id}`,
         { status: 'on the way' }
       );
       
@@ -39,7 +41,7 @@ const DeliveryTracking = () => {
 
     try {
       const response = await axios.put(
-        `http://localhost:8020/order/updateOrder/${orderDetails._id}`,
+        `${ORDER_API}/updateOrder/${orderDetails._id}`,
         { status: 'arrived' }
       );
       
@@ -61,7 +63,7 @@ const DeliveryTracking = () => {
 
     try {
       const response = await axios.put(
-        `http://localhost:8020/order/updateOrder/${orderDetails._id}`,
+        `${ORDER_API}/updateOrder/${orderDetails._id}`,
         { status: 'completed' }
       );
       

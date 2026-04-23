@@ -4,6 +4,8 @@ import { MdRestaurant, MdDeliveryDining, MdOutlineTimer } from "react-icons/md";
 import { FaRupeeSign } from "react-icons/fa";
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
+const ORDER_API = process.env.REACT_APP_ORDER_API || "http://localhost:8020/order";
+
 const statusOptions = [
   { value: "pending", label: "Pending", className: "bg-yellow-100 text-yellow-800" },
   { value: "confirmed", label: "Confirmed", className: "bg-blue-100 text-blue-800" },
@@ -18,7 +20,7 @@ const ViewOrders = () => {
   useEffect(() => {
     const getOrders = async () => {
       try {
-        const res = await axios.get(`http://localhost:8020/order/getOrders`);
+        const res = await axios.get(`${ORDER_API}/getOrders`);
         setOrders(res.data);
       } catch (err) {
         console.error("Error fetching orders:", err);
@@ -31,7 +33,7 @@ const ViewOrders = () => {
   const handleUpdateState = async (orderId, newState) => {
     try {
       const res = await axios.put(
-        `http://localhost:8020/order/updateOrder/${orderId}`,
+        `${ORDER_API}/updateOrder/${orderId}`,
         { status: newState }
       );
       const updatedOrder = res.data;

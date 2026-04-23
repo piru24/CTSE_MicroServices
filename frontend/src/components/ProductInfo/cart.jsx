@@ -8,6 +8,7 @@ import { FaRegCreditCard } from "react-icons/fa";
 
 const KEY =
   "pk_test_51Q5kUrKs4ldJ96PWJsuoDCG9WwlLqb5rS6eBXsrdEGMMifKnRIrabnhta1MvPcabDAZEsuf3lK4V3I01d7eUcvWp00o91jsc6s";
+const ORDER_API = process.env.REACT_APP_ORDER_API || "http://localhost:8020/order";
 
 const Cart = () => {
   const cart = useSelector((state) => state.cart);
@@ -62,7 +63,7 @@ const Cart = () => {
   useEffect(() => {
     const makeRequest = async () => {
       try {
-        const res = await axios.post("http://localhost:8020/order/payment", {
+        const res = await axios.post(`${ORDER_API}/payment`, {
           tokenId: stripeToken.id,
           amount: cart.total,
         });
@@ -87,7 +88,7 @@ const Cart = () => {
     };
     try {
       const res = await axios.post(
-        "http://localhost:8020/order/addOrder",
+        `${ORDER_API}/addOrder`,
         orderData
       );
       console.log(orderData);

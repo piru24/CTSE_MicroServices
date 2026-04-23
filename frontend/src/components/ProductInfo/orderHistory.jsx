@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { FiPackage, FiClock, FiCheckCircle, FiInfo } from 'react-icons/fi';
 import { MdOutlineDeliveryDining } from 'react-icons/md';
 
+const ORDER_API = process.env.REACT_APP_ORDER_API || 'http://localhost:8020/order';
+
 const OrderHistory = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -12,7 +14,7 @@ const OrderHistory = () => {
   useEffect(() => {
     const getOrders = async () => {
       try {
-        const res = await axios.get('http://localhost:8020/order/orderhistory', { 
+        const res = await axios.get(`${ORDER_API}/orderhistory`, {
           withCredentials: true 
         });
         setOrders(Array.isArray(res.data) ? res.data : []);

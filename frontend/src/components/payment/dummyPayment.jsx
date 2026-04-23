@@ -5,6 +5,8 @@ import Swal from "sweetalert2";
 import axios from "axios";
 import { FaCreditCard, FaUser, FaEnvelope, FaMobileAlt, FaLock } from "react-icons/fa";
 
+const ORDER_API = process.env.REACT_APP_ORDER_API || "http://localhost:8020/order";
+
 export default function AddPayment() {
   const navigate = useNavigate();
   const cart = useSelector((state) => state.cart);
@@ -103,7 +105,7 @@ export default function AddPayment() {
 
       // ORDER CREATION
       await axios.post(
-        "http://localhost:8020/Order/addOrder",
+        `${ORDER_API}/addOrder`,
         orderData,
         {
           headers: {
