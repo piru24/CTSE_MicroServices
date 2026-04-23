@@ -24,7 +24,7 @@ app.use(cors({
 app.use(bodyParser.json());
 
 app.get("/order/health", (req, res) => {
-  res.status(200).json({ status: "Order Service is healthy" });
+  res.status(200).json({ status: "Order Service is Success" });
 });
 
 app.get("/order/ready", (req, res) => {
