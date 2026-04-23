@@ -1,42 +1,49 @@
 const amqp = require("amqplib");
+const Delivery = require("../model/delivery");
 
 async function startDeliveryConsumer() {
 
   try {
 
-    const connection = await amqp.connect("amqp://rabbitmq:5672");
-
+    const connection = await amqp.connect(process.env.RABBITMQ_URL);
     const channel = await connection.createChannel();
 
-    await channel.assertExchange("user.events", "topic", {
+    await channel.assertExchange("order.events", "topic", {
       durable: true
     });
 
-    const q = await channel.assertQueue("delivery_seller_availability", {
+    const q = await channel.assertQueue("delivery_order_dispatched", {
       durable: true
     });
 
     await channel.bindQueue(
       q.queue,
-      "user.events",
-      "seller.availability.changed"
+      "order.events",
+      "order.dispatched"
     );
 
-    console.log("🚚 Delivery Service listening for events...");
+    console.log("🚚 Delivery Service listening for dispatched orders...");
 
-    channel.consume(q.queue, (msg) => {
+    channel.consume(q.queue, async (msg) => {
 
       const data = JSON.parse(msg.content.toString());
 
-      console.log("🚚 Seller availability changed:", data);
+      console.log("📦 Received dispatched order:", data._id);
 
-      if (!data.isAvailable) {
+      try {
 
-        console.log("❌ Stop assigning deliveries for seller:", data.sellerId);
+        const delivery = new Delivery({
+          orderId: data._id,
+          status: "pending"
+        });
 
-      } else {
+        await delivery.save();
 
-        console.log("✅ Seller available again:", data.sellerId);
+        console.log("🚚 Delivery created for order:", data._id);
+
+      } catch (err) {
+
+        console.log("⚠️ Delivery already exists or error:", err.message);
 
       }
 

@@ -97,104 +97,135 @@ const DeliveryTracking = () => {
     'pending': 'bg-gray-100 text-gray-800'
   };
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-500 via-gray-400 to-green-700 py-12 px-4">
-      <div className="max-w-4xl mx-auto">
-        <div className="bg-white/90 backdrop-blur-lg rounded-2xl shadow-xl p-8 border border-green-100">
-          <div className="flex items-center gap-4 mb-8">
-            <div className="p-3 bg-green-500 rounded-full text-white">
-              <MdDeliveryDining className="text-3xl" />
-            </div>
-            <h2 className="text-3xl font-bold text-green-800">Order Delivery Details</h2>
+return (
+  <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-200 py-12 px-4">
+    <div className="max-w-4xl mx-auto">
+      <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-200">
+
+        <div className="flex items-center gap-4 mb-8">
+          <div className="p-3 bg-[#f7941d] rounded-full text-white">
+            <MdDeliveryDining className="text-3xl" />
           </div>
 
-          {/* Order Card */}
-          <div className="bg-green-50 rounded-xl p-6 mb-8 shadow-sm">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-semibold text-green-800 flex items-center gap-2">
-                <MdFastfood className="text-green-500" />
-                Order #{orderDetails._id.slice(-6).toUpperCase()}
-              </h3>
-              <span className={`px-4 py-1 rounded-full text-sm font-medium ${statusColors[status.toLowerCase()]}`}>
-                {status}
-              </span>
+          <h2 className="text-3xl font-bold text-gray-900">
+            Order Delivery Details
+          </h2>
+        </div>
+
+        {/* Order Card */}
+        <div className="bg-gray-50 rounded-xl p-6 mb-8 shadow-sm border border-gray-200">
+
+          <div className="flex items-center justify-between mb-4">
+
+            <h3 className="text-xl font-semibold text-gray-800 flex items-center gap-2">
+              <MdFastfood className="text-[#f7941d]" />
+              Order #{orderDetails._id.slice(-6).toUpperCase()}
+            </h3>
+
+            <span className={`px-4 py-1 rounded-full text-sm font-medium ${statusColors[status.toLowerCase()]}`}>
+              {status}
+            </span>
+
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8">
+
+            {/* Order Details */}
+            <div className="space-y-4">
+
+              <div className="flex items-center gap-3">
+                <FaRupeeSign className="text-[#f7941d]" />
+                <p className="text-gray-700">
+                  <span className="font-semibold">Amount:</span> LKR {orderDetails.amount}
+                </p>
+              </div>
+
+              <div>
+                <h4 className="text-lg font-semibold text-gray-800 mb-2 flex items-center gap-2">
+                  <MdOutlineTimer className="text-[#f7941d]" />
+                  Products
+                </h4>
+
+                <ul className="space-y-2">
+                  {orderDetails.products.map((product, index) => (
+                    <li
+                      key={index}
+                      className="flex justify-between items-center bg-white p-3 rounded-lg border border-gray-200"
+                    >
+                      <span className="text-gray-700">{product.name}</span>
+
+                      <span className="text-gray-600 font-medium">
+                        Qty: {product.quantity}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
             </div>
 
-            <div className="grid md:grid-cols-2 gap-8">
-              {/* Order Details */}
-              <div className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <FaRupeeSign className="text-green-500" />
-                  <p className="text-gray-700"><span className="font-semibold">Amount:</span> LKR {orderDetails.amount}</p>
-                </div>
-                
+            {/* Customer Details */}
+            <div className="space-y-4">
+
+              <div className="flex items-center gap-3">
+                <FaUser className="text-[#f7941d]" />
+
                 <div>
-                  <h4 className="text-lg font-semibold text-green-800 mb-2 flex items-center gap-2">
-                    <MdOutlineTimer className="text-green-500" />
-                    Products
+                  <p className="font-semibold text-gray-800">{user.name}</p>
+                  <p className="text-gray-600">{user.mobile}</p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <FaMapMarkerAlt className="text-[#f7941d] mt-1" />
+
+                <div>
+                  <h4 className="font-semibold text-gray-800">
+                    Delivery Address
                   </h4>
-                  <ul className="space-y-2">
-                    {orderDetails.products.map((product, index) => (
-                      <li key={index} className="flex justify-between items-center bg-white p-3 rounded-lg shadow-sm">
-                        <span className="text-gray-700">{product.name}</span>
-                        <span className="text-green-600 font-medium">Qty: {product.quantity}</span>
-                      </li>
-                    ))}
-                  </ul>
+
+                  <p className="text-gray-600">{user.address}</p>
                 </div>
               </div>
 
-              {/* Customer Details */}
-              <div className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <FaUser className="text-green-500" />
-                  <div>
-                    <p className="font-semibold text-gray-800">{user.name}</p>
-                    <p className="text-gray-600">{user.mobile}</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <FaMapMarkerAlt className="text-green-500 mt-1" />
-                  <div>
-                    <h4 className="font-semibold text-green-800">Delivery Address</h4>
-                    <p className="text-gray-600">{user.address}</p>
-                  </div>
-                </div>
-              </div>
             </div>
-          </div>
 
-          {/* Delivery Actions */}
-          <div className="space-y-4">
-            <button 
-              onClick={handleStartDelivery}
-              className="w-full bg-gradient-to-r from-green-500 to-green-600 text-white py-3 px-6 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2"
-            >
-              <MdDeliveryDining className="text-xl" />
-              Start Delivery
-            </button>
-
-            <button 
-              onClick={handleDoorDelivery}
-              className="w-full bg-gradient-to-r from-yellow-400 to-yellow-500 text-gray-900 py-3 px-6 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2"
-            >
-              <MdCheckCircle className="text-xl" />
-              Mark as Arrived
-            </button>
-
-            <button 
-              onClick={handleEndDelivery}
-              className="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-3 px-6 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2"
-            >
-              <MdCheckCircle className="text-xl" />
-              Complete Delivery
-            </button>
           </div>
         </div>
+
+        {/* Delivery Actions */}
+        <div className="space-y-4">
+
+          <button
+            onClick={handleStartDelivery}
+            className="w-full bg-[#f7941d] text-white py-3 px-6 rounded-xl font-semibold shadow-md hover:bg-[#ea7a00] transition-all flex items-center justify-center gap-2"
+          >
+            <MdDeliveryDining className="text-xl" />
+            Start Delivery
+          </button>
+
+          <button
+            onClick={handleDoorDelivery}
+            className="w-full bg-yellow-400 text-gray-900 py-3 px-6 rounded-xl font-semibold shadow-md hover:bg-yellow-500 transition-all flex items-center justify-center gap-2"
+          >
+            <MdCheckCircle className="text-xl" />
+            Mark as Arrived
+          </button>
+
+          <button
+            onClick={handleEndDelivery}
+            className="w-full bg-blue-500 text-white py-3 px-6 rounded-xl font-semibold shadow-md hover:bg-blue-600 transition-all flex items-center justify-center gap-2"
+          >
+            <MdCheckCircle className="text-xl" />
+            Complete Delivery
+          </button>
+
+        </div>
+
       </div>
     </div>
-  );
+  </div>
+);
 };
 
 export default DeliveryTracking;

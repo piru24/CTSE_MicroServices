@@ -2,6 +2,7 @@ require("dotenv").config();
 //await amqp.connect("https://rabbitmq.agreeablestone-66d4ad90.southeastasia.azurecontainerapps.io");
 const amqp = require("amqplib");
 const nodemailer = require("nodemailer");
+const RABBITMQ_URL = process.env.RABBITMQ_URL || "amqp://localhost:5672";
 
 async function startEmailConsumer() {
 

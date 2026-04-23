@@ -98,31 +98,31 @@ const Cart = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-500 via-gray-400 to-green-700 py-12">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-200 py-12">
       <div className="container mx-auto px-4">
-        <h1 className="text-4xl font-extrabold text-center text-green-800 mb-10 tracking-tight drop-shadow flex items-center justify-center gap-2">
+        <h1 className="text-4xl font-extrabold text-center text-[#f7941d] mb-10 tracking-tight drop-shadow flex items-center justify-center gap-2">
           <MdFastfood className="text-yellow-500" /> Your Cart
         </h1>
 
         {/* Cart Table */}
-        <div className="overflow-x-auto bg-white/90 shadow-2xl rounded-3xl p-8 border border-green-100">
+        <div className="overflow-x-auto bg-white/90 shadow-2xl rounded-3xl p-8 border border-gray-200">
           <table className="min-w-full">
-            <thead className="bg-green-100">
+            <thead className="bg-gray-100">
               <tr>
-                <th className="px-6 py-3 text-left text-sm font-bold text-green-800 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-sm font-bold text-[#f7941d] uppercase tracking-wider">
                   Product
                 </th>
-                <th className="px-6 py-3 text-left text-sm font-bold text-green-800 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-sm font-bold text-[#f7941d]uppercase tracking-wider">
                   Quantity
                 </th>
-                <th className="px-6 py-3 text-left text-sm font-bold text-green-800 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-sm font-bold text-[#f7941d] uppercase tracking-wider">
                   Price
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-green-100">
+            <tbody className="divide-y divide-gray-200">
               {cart.products.map((product, index) => (
-                <tr key={index} className="hover:bg-green-50 transition">
+                <tr key={index} className="hover:bg-orange-50 transition">
                   <td className="px-6 py-4 text-lg text-green-900 font-semibold flex items-center gap-2">
                     <img
                       src={product.image || "/images/food-bg1.jpg"}
@@ -143,7 +143,7 @@ const Cart = () => {
 
         {/* Delivery Options */}
         <div className="mt-10">
-          <h2 className="text-2xl font-bold text-green-800 mb-4 flex items-center gap-2">
+          <h2 className="text-2xl font-bold text-[#f7941d] mb-4 flex items-center gap-2">
             <MdDeliveryDining className="text-yellow-500" /> Delivery Options
           </h2>
           <div className="flex flex-col md:flex-row items-center gap-4">
@@ -174,7 +174,7 @@ const Cart = () => {
                   onChange={handleOptionChange}
                   className="accent-green-600 w-5 h-5"
                 />
-                <span className="text-green-800 font-semibold">
+                <span className="text-[#f7941d] font-semibold">
                   Fast Delivery
                 </span>
                 <span className="text-yellow-600 font-bold">
@@ -191,7 +191,7 @@ const Cart = () => {
                   onChange={handleOptionChange}
                   className="accent-green-600 w-5 h-5"
                 />
-                <span className="text-green-800 font-semibold">
+                <span className="text-[#f7941d] font-semibold">
                   Cheap Delivery
                 </span>
                 <span className="text-yellow-600 font-bold">
@@ -204,7 +204,7 @@ const Cart = () => {
 
         {/* Order Summary */}
         <div className="mt-10 bg-white/90 shadow-2xl rounded-3xl p-8 border border-green-100 max-w-xl mx-auto">
-          <h2 className="text-2xl font-bold text-green-800 mb-6 flex items-center gap-2">
+          <h2 className="text-2xl font-bold text-[#f7941d] mb-6 flex items-center gap-2">
             <FaRegCreditCard className="text-yellow-500" /> Order Summary
           </h2>
           <div className="flex justify-between text-green-700 text-lg mb-2">

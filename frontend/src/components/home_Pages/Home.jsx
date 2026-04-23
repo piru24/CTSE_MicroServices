@@ -13,7 +13,7 @@ const staticProducts = [
     name: "Wireless Headphones",
     category: "electronics",
     price: 89.99,
-    image: "images/headphone.jpg",
+    image: "/images/headphone.jpg",
     sellerName: "TechWorld",
     desc: "Noise cancelling wireless headphones",
     avgRating: 4.5
@@ -51,6 +51,7 @@ const staticProducts = [
 ];
 
 const Home = () => {
+
   const { isLoggedIn, token } = useSelector((state) => state.auth);
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -59,29 +60,37 @@ const Home = () => {
   const [categories, setCategories] = useState([]);
 
   useEffect(() => {
+
     const getProducts = async () => {
+
       try {
+
         let fetched = [];
 
         if (isLoggedIn) {
+
           const res = await axios.get(
             "http://localhost:8070/products/getProducts",
             {
               headers: { Authorization: `Bearer ${token}` },
-              withCredentials: true,
+              withCredentials: true
             }
           );
 
           fetched = res.data;
+
         }
 
         const combined = [...staticProducts, ...fetched];
+
         setProducts(combined);
         extractCategories(combined);
+
       } catch {
         setProducts(staticProducts);
         extractCategories(staticProducts);
       }
+
     };
 
     getProducts();
@@ -137,12 +146,11 @@ const Home = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
-
             <FiSearch className="absolute right-5 top-3 text-gray-500 text-xl" />
           </div>
+
         </div>
       </section>
-
 
       {/* PRODUCTS */}
       <section className="container mx-auto px-4 py-10">
@@ -151,13 +159,13 @@ const Home = () => {
           Trending Products
         </h2>
 
+        {/* CATEGORY FILTER */}
         <div className="flex gap-3 overflow-x-auto pb-4">
           {categories.map((category) => (
             <button
               key={category.value}
               onClick={() => setSelectedCategory(category.value)}
-              className={`px-6 py-2 rounded-full whitespace-nowrap
-              ${
+              className={`px-6 py-2 rounded-full whitespace-nowrap ${
                 selectedCategory === category.value
                   ? "bg-[#f7941d] text-white"
                   : "bg-white border"
@@ -168,12 +176,14 @@ const Home = () => {
           ))}
         </div>
 
+        {/* PRODUCT GRID */}
         <div className="grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-4 mt-6">
           {filteredProducts.map((product) => (
             <div
               key={product._id}
               className="bg-white rounded-xl shadow hover:shadow-lg transition"
             >
+
               <img
                 src={product.image}
                 alt={product.name}
@@ -183,9 +193,11 @@ const Home = () => {
               <div className="p-5">
 
                 <h3 className="font-semibold text-lg">{product.name}</h3>
+
                 <p className="text-sm text-gray-500">{product.desc}</p>
 
                 <div className="flex justify-between items-center mt-3">
+
                   <span className="text-[#f7941d] font-bold">
                     ${product.price}
                   </span>
@@ -194,6 +206,7 @@ const Home = () => {
                     <FiStar className="text-yellow-500 mr-1" />
                     {product.avgRating}
                   </div>
+
                 </div>
 
                 <div className="flex items-center text-sm text-gray-600 mt-3">
@@ -203,14 +216,17 @@ const Home = () => {
 
                 <Link to="/products">
                   <button className="w-full mt-4 bg-[#f7941d] hover:bg-[#ef6c00] text-white py-2 rounded-lg flex items-center justify-center gap-2">
-                    <FiShoppingCart /> View Product
+                    <FiShoppingCart />
+                    View Product
                   </button>
                 </Link>
 
               </div>
+
             </div>
           ))}
         </div>
+
       </section>
 
     </div>
