@@ -26,5 +26,5 @@ jobs:
       # 🔹 AUTH SERVICE
       - name: Build & Push Auth
         run: |
-          docker build -t ${{ secrets.ACR_LOGIN_SERVER }}/auth-service:v1 ./backend/services/auth
+          docker build -t ${{ secrets.ACR_LOGIN_SERVER }}/auth-service:v1 ./backend/services/authenticate
           docker push ${{ secrets.ACR_LOGIN_SERVER }}/auth-service:v1
