@@ -14,11 +14,7 @@ const getAllProducts = async (req, res, next) => {
   }
   return res.status(200).json(product);
 }; 
-const getAllProducts = async (req, res, next) => {
-  return res.status(200).json({
-    message: "🚀 CI/CD TEST SUCCESS"
-  });
-};
+
 
 
 //get products by id
