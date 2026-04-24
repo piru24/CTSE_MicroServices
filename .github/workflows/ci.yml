@@ -57,9 +57,21 @@ jobs:
         run: |
          docker build -t ${{ secrets.ACR_LOGIN_SERVER }}/delivery-service:v1 ./backend/services/delivery
          docker push ${{ secrets.ACR_LOGIN_SERVER }}/delivery-service:v1
-
+      - name: Scan Delivery Image (Trivy)
+        uses: aquasecurity/trivy-action@master
+        with:
+         image-ref: ${{ secrets.ACR_LOGIN_SERVER }}/delivery-service:v1
+         format: table
+         exit-code: 0
+      
      # 🔹 PAYMENT SERVICE
       - name: Build & Push Payment
         run: |
           docker build -t ${{ secrets.ACR_LOGIN_SERVER }}/payment-service:v1 ./backend/services/payment
           docker push ${{ secrets.ACR_LOGIN_SERVER }}/payment-service:v1
+      - name: Scan Payment Image (Trivy)
+        uses: aquasecurity/trivy-action@master  
+        with:
+         image-ref: ${{ secrets.ACR_LOGIN_SERVER }}/payment-service:v1
+         format: table
+         exit-code: 0
