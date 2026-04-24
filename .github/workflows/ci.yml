@@ -76,22 +76,4 @@ jobs:
          format: table
          exit-code: 0
 
-      # 🔹 CD
-      
-
-      - name: Azure Login
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-         
-      - name: Deploy Product Service
-        run: |
-         az containerapp update --name product-service --resource-group microservices-rg2 --image ${{ secrets.ACR_LOGIN_SERVER }}/product-service:v5
-
-      - name: Deploy Auth Service
-        run: |
-         az containerapp update --name auth-service --resource-group microservices-rg2 --image ${{ secrets.ACR_LOGIN_SERVER }}/auth-service:v1
-
-      - name: Deploy Order Service
-        run: |
-         az containerapp update --name order-service --resource-group microservices-rg2 --image ${{ secrets.ACR_LOGIN_SERVER }}/order-service:v1
+ 
