@@ -20,7 +20,7 @@ jobs:
       # 🔹 PRODUCT SERVICE
       - name: Build & Push Product
         run: |
-          docker build -t ${{ secrets.ACR_LOGIN_SERVER }}/product-service:v1 ./backend/services/products
+          docker build -t ${{ secrets.ACR_LOGIN_SERVER }}/product-service:v5 ./backend/services/products
           docker push ${{ secrets.ACR_LOGIN_SERVER }}/product-service:v5
 
       - name: Scan Product Image (Trivy)
