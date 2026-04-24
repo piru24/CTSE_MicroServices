@@ -2,7 +2,18 @@ const Products = require("../model/products");
 const axios= require("axios")
 
 //get all products  
-
+const getAllProducts = async (req, res, next) => {
+  let product;
+  try {
+    product = await Products.find();
+  } catch (err) {
+    console.log(err);
+  }
+  if (!product) {
+    return res.status(404).json({ message: "Nothing found product" });
+  }
+  return res.status(200).json(product);
+}; 
 const getAllProducts = async (req, res, next) => {
   return res.status(200).json({
     message: "🚀 CI/CD TEST SUCCESS"
