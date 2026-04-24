@@ -17,7 +17,7 @@ const DeliveryTracking = () => {
 
     try {
       const response = await axios.put(
-        `http://localhost:8020/order/updateOrder/${orderDetails._id}`,
+        `https://order-service.agreeablestone-66d4ad90.southeastasia.azurecontainerapps.io/order/updateOrder/${orderDetails._id}`,
         { status: 'on the way' }
       );
       
@@ -39,7 +39,7 @@ const DeliveryTracking = () => {
 
     try {
       const response = await axios.put(
-        `http://localhost:8020/order/updateOrder/${orderDetails._id}`,
+        `https://order-service.agreeablestone-66d4ad90.southeastasia.azurecontainerapps.io/order/updateOrder/${orderDetails._id}`,
         { status: 'arrived' }
       );
       
@@ -61,7 +61,7 @@ const DeliveryTracking = () => {
 
     try {
       const response = await axios.put(
-        `http://localhost:8020/order/updateOrder/${orderDetails._id}`,
+        `https://order-service.agreeablestone-66d4ad90.southeastasia.azurecontainerapps.io/order/updateOrder/${orderDetails._id}`,
         { status: 'completed' }
       );
       
@@ -79,7 +79,7 @@ const DeliveryTracking = () => {
 
 
   useEffect(() => {
-    axios.get(`http://localhost:5000/user/${cusid}`)
+    axios.get(`https://auth-service.agreeablestone-66d4ad90.southeastasia.azurecontainerapps.io/user/${cusid}`)
       .then(response => setUser(response.data.user))
       .catch(error => console.error('Error fetching user details:', error));
   }, []);

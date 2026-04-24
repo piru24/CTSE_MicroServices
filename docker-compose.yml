@@ -1,83 +1,100 @@
-version: "3.8"
-
 services:
 
   rabbitmq:
     image: rabbitmq:3-management
-    container_name: rabbitmq
     ports:
       - "5672:5672"
       - "15672:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   auth-service:
     build: ./backend/services/authenticate
     ports:
       - "5000:5000"
     depends_on:
-      - rabbitmq
+      rabbitmq:
+        condition: service_healthy
     environment:
       - RABBITMQ_URL=amqp://rabbitmq:5672
+    restart: always
 
   cart-service:
     build: ./backend/services/cart
     ports:
-      - "8051:8051"
+      - "8052:8052"
     depends_on:
-      - rabbitmq
+      rabbitmq:
+        condition: service_healthy
     environment:
       - RABBITMQ_URL=amqp://rabbitmq:5672
+    restart: always
 
   delivery-service:
     build: ./backend/services/delivery
     ports:
       - "8300:8300"
     depends_on:
-      - rabbitmq
+      rabbitmq:
+        condition: service_healthy
     environment:
       - RABBITMQ_URL=amqp://rabbitmq:5672
+    restart: always
 
   email-service:
     build: ./backend/services/email
     ports:
       - "8100:8100"
     depends_on:
-      - rabbitmq
+      rabbitmq:
+        condition: service_healthy
     environment:
       - RABBITMQ_URL=amqp://rabbitmq:5672
+    restart: always
 
   order-service:
-    build: ./backend/services/Order 
+    build: ./backend/services/order
     ports:
       - "8020:8020"
     depends_on:
-      - rabbitmq
+      rabbitmq:
+        condition: service_healthy
     environment:
       - RABBITMQ_URL=amqp://rabbitmq:5672
+    restart: always
 
   payment-service:
-    build: ./backend/services/payment 
+    build: ./backend/services/payment
     ports:
       - "8500:8500"
     depends_on:
-      - rabbitmq
+      rabbitmq:
+        condition: service_healthy
     environment:
       - RABBITMQ_URL=amqp://rabbitmq:5672
+    restart: always
 
   product-service:
     build: ./backend/services/products
     ports:
-      - "8070:8070"
+      - "8072:8072"
     depends_on:
-      - rabbitmq  
+      rabbitmq:
+        condition: service_healthy
     environment:
       - RABBITMQ_URL=amqp://rabbitmq:5672
-
+    restart: always
 
   rating-service:
     build: ./backend/services/ratings
     ports:
-      - "8079:8079"
+      - "8080:8080"
     depends_on:
-      - rabbitmq
+      rabbitmq:
+        condition: service_healthy
     environment:
       - RABBITMQ_URL=amqp://rabbitmq:5672
+    restart: always

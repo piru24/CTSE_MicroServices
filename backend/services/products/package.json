@@ -12,6 +12,6 @@
     "nodemon": "^2.0.21"
   },
   "scripts": {
-    "start": "nodemon products-server.js"
+    "start": "node products-server.js"
   }
 }

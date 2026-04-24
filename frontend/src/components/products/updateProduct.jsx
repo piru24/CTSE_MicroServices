@@ -20,7 +20,7 @@ export default function UpdateProducts() {
   useEffect(() => {
     const getProductById = () => {
       axios
-        .get(`http://localhost:8072/products/getProduct/${id}`)
+        .get(`https://product-service.agreeablestone-66d4ad90.southeastasia.azurecontainerapps.io/products/getProduct/${id}`)
         .then((res) => {
           setProducts(res.data.product);
         });
@@ -35,7 +35,7 @@ export default function UpdateProducts() {
   const UpdateProductsHandler = (e) => {
     e.preventDefault();
     axios
-      .put(`http://localhost:8072/products/updateProduct/${id}`, products)
+      .put(`https://product-service.agreeablestone-66d4ad90.southeastasia.azurecontainerapps.io/products/updateProduct/${id}`, products)
       .then(() => {
         swal.fire(`Successfully updated`);
         navigate("/profile");

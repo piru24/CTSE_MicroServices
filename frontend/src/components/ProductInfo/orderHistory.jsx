@@ -10,20 +10,34 @@ const OrderHistory = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const getOrders = async () => {
-      try {
-        const res = await axios.get('http://localhost:8020/order/orderhistory', { 
-          withCredentials: true 
-        });
-        setOrders(Array.isArray(res.data) ? res.data : []);
-      } catch (err) {
-        console.error('Error fetching order history:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    getOrders();
-  }, []);
+  const getOrders = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const cleanToken = token?.replace(/"/g, "");
+
+      const res = await axios.get(
+        "https://order-service.agreeablestone-66d4ad90.southeastasia.azurecontainerapps.io/order/orderhistory",
+        {
+          headers: {
+            Authorization: `Bearer ${cleanToken}`,
+          },
+        }
+      );
+
+      setOrders(Array.isArray(res.data) ? res.data : []);
+
+    } catch (err) {
+      console.error(
+        "Error fetching order history:",
+        err.response?.data || err.message
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  getOrders();
+}, []);
 
   const getStatusIcon = (status) => {
     switch (status.toLowerCase()) {

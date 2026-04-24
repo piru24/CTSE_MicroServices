@@ -23,80 +23,119 @@ const Cart = () => {
   const [fastDeliveryTime, setFastDeliveryTime] = useState();
   const [visibility, setVisibility] = useState(false);
 
-  const getDeliveryPrices = async () => {
+const getDeliveryPrices = async () => {
+  try {
     const randomWeight = Math.random() * 4.9 + 1.0;
+
     const deliveryData = {
       shipfrom: "Colombo",
       shipto: address,
       weight: randomWeight,
     };
+
     const deliveryResult = await axios.post(
-      "http://localhost:8300/delivery/rate",
+      "https://delivery-service.ashysand-313f7325.southeastasia.azurecontainerapps.io/delivery/rate",
       deliveryData
     );
+
     setVisibility(true);
+
     setCheapDelivery(deliveryResult.data.cheapDelivery.rate / 10);
     setFastDelivery(deliveryResult.data.fastDelivery.rate / 10);
+
     setCheapDeliveryTime(deliveryResult.data.cheapDelivery.duration);
     setFastDeliveryTime(deliveryResult.data.fastDelivery.duration);
-  };
 
-  const handleOptionChange = (event) => {
-    setDeliveryType(event.target.value);
-    setDeliveryCharge(
-      event.target.value === "fast" ? fastDelivery : cheapDelivery
-    );
-    setFinalTotal(cart.withCommision + (event.target.value === "fast" ? fastDelivery : cheapDelivery));
-  };
+  } catch (err) {
+    console.log("❌ Delivery Error:", err.response?.data || err.message);
+  }
+};
+
+ const handleOptionChange = (event) => {
+  const selected = event.target.value;
+
+  setDeliveryType(selected);
+
+  const selectedCharge =
+    selected === "fast" ? fastDelivery : cheapDelivery;
+
+  setDeliveryCharge(selectedCharge);
+};
 
   const navigate = useNavigate();
-
-  useEffect(() => {
-    setFinalTotal(cart.withCommision);
-  }, [cheapDelivery, fastDelivery, address, deliveryCharge, cart.withCommision]);
-
+useEffect(() => {
+  const delivery = deliveryCharge || 0;
+  setFinalTotal(cart.withCommision + delivery);
+}, [deliveryCharge, cart.withCommision]);
   const onToken = (token) => {
     setStripeToken(token);
   };
 
-  useEffect(() => {
-    const makeRequest = async () => {
-      try {
-        const res = await axios.post("http://localhost:8020/order/payment", {
-          tokenId: stripeToken.id,
-          amount: cart.total,
-        });
-        console.log(res.data);
-      } catch (err) {
-        console.log(err);
-      }
-    };
-    stripeToken && makeRequest();
-  }, [stripeToken, cart.total]);
+useEffect(() => {
+  const makeRequest = async () => {
+    try {
+      const token = localStorage.getItem("token")?.replace(/"/g, "");
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+      const res = await axios.post(
+        "https://order-service.agreeablestone-66d4ad90.southeastasia.azurecontainerapps.io/order/payment",
+        {
+          tokenId: stripeToken.id,
+          amount: finalTotal, // ✅ FIXED
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      console.log("✅ Payment Success:", res.data);
+
+    } catch (err) {
+      console.log("❌ Payment Error:", err.response?.data || err.message);
+    }
+  };
+
+  if (stripeToken) {
+    makeRequest();
+  }
+}, [stripeToken, finalTotal]);
+
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  try {
+    const token = localStorage.getItem("token")?.replace(/"/g, "");
+
     const orderData = {
       products: cart.products.map((product) => ({
         productId: product._id,
         name: product.name,
         quantity: product.quantity,
       })),
-      amount: cart.withCommision,
+      amount: finalTotal, // ✅ FIXED
       status: "pending",
     };
-    try {
-      const res = await axios.post(
-        "http://localhost:8020/order/addOrder",
-        orderData
-      );
-      console.log(orderData);
-      console.log(res.data);
-    } catch (error) {
-      console.error(error);
-    }
-  };
 
+    const res = await axios.post(
+      "https://order-service.agreeablestone-66d4ad90.southeastasia.azurecontainerapps.io/order/addOrder",
+      orderData,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    console.log("✅ Order Created:", res.data);
+
+  } catch (error) {
+    console.error(
+      "❌ Order Error:",
+      error.response?.data || error.message
+    );
+  }
+};
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-200 py-12">
       <div className="container mx-auto px-4">

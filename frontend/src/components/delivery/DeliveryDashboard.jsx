@@ -15,7 +15,7 @@ const DeliveryDashboard = () => {
   useEffect(() => {
     const getOrders = async () => {
       try {
-        const res = await axios.get(`http://localhost:8020/order/dispatchedOrders`);
+        const res = await axios.get(`https://order-service.agreeablestone-66d4ad90.southeastasia.azurecontainerapps.io/order/dispatchedOrders`);
         setOrders(res.data);
       } catch (err) {
         console.error("Error fetching dispatched orders", err);
@@ -27,7 +27,7 @@ const DeliveryDashboard = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const userRes = await axios.get('http://localhost:5000/user/profile');
+        const userRes = await axios.get('https://auth-service.agreeablestone-66d4ad90.southeastasia.azurecontainerapps.io/user/profile');
         setUser(userRes.data.user);
       } catch (err) {
         console.error(err);

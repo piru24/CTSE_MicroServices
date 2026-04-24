@@ -26,10 +26,22 @@ export default function AddPayment() {
     }));
   };
 
+  // ✅ DEFINE FINAL TOTAL (FIXED)
+  const finalTotal =
+    cart?.withCommision ||
+    cart?.total ||
+    (cart?.products
+      ? cart.products.reduce(
+          (sum, p) => sum + (p.price || 0) * (p.quantity || 1),
+          0
+        )
+      : 0);
+
   const AddPayment = async (e) => {
     e.preventDefault();
 
-    const token = localStorage.getItem("token");
+    // ✅ Get and clean token
+    const token = localStorage.getItem("token")?.replace(/"/g, "");
 
     if (!token) {
       Swal.fire({
@@ -40,18 +52,8 @@ export default function AddPayment() {
       return;
     }
 
-    // Safely calculate amount
-    const amount =
-      cart?.withCommision ||
-      cart?.total ||
-      (cart?.products
-        ? cart.products.reduce(
-            (sum, p) => sum + (p.price || 0) * (p.quantity || 1),
-            0
-          )
-        : 0);
-
-    if (!amount || amount <= 0) {
+    // ✅ Validate amount
+    if (!finalTotal || finalTotal <= 0) {
       Swal.fire({
         title: "Cart Empty",
         text: "Your cart has no valid total amount",
@@ -60,10 +62,11 @@ export default function AddPayment() {
       return;
     }
 
+    // ✅ Payment payload
     const paymentData = {
       email: payments.email,
       mobile: payments.mobile,
-      amount: String(amount), // backend expects numeric string
+      amount: String(finalTotal), // ✅ consistent total
       card: {
         number: payments.number,
         expiration: payments.expiration,
@@ -73,15 +76,14 @@ export default function AddPayment() {
     };
 
     try {
-      // PAYMENT REQUEST
+      // 🔹 PAYMENT REQUEST
       await axios.post(
-        "http://localhost:8500/payment/card",
+        "https://payment-service.wittysea-78387375.eastasia.azurecontainerapps.io/payment/card",
         paymentData,
         {
           headers: {
             Authorization: `Bearer ${token}`
-          },
-          withCredentials: true
+          }
         }
       );
 
@@ -91,31 +93,32 @@ export default function AddPayment() {
         confirmButtonColor: "#16a34a"
       });
 
+      // ✅ Order payload
       const orderData = {
         products: cart.products.map((product) => ({
           productId: product._id,
           name: product.name,
           quantity: product.quantity
         })),
-        amount: amount,
+        amount: finalTotal, // ✅ same amount
         status: "pending"
       };
 
-      // ORDER CREATION
+      // 🔹 ORDER CREATION (FIXED URL)
       await axios.post(
-        "http://localhost:8020/Order/addOrder",
+        "https://order-service.agreeablestone-66d4ad90.southeastasia.azurecontainerapps.io/order/addOrder",
         orderData,
         {
           headers: {
             Authorization: `Bearer ${token}`
-          },
-          withCredentials: true
+          }
         }
       );
 
       navigate("/getOrders");
+
     } catch (error) {
-      console.error("Payment error:", error?.response || error);
+      console.error("❌ Payment error:", error.response?.data || error.message);
 
       Swal.fire({
         title: "Payment Failed",
@@ -124,6 +127,8 @@ export default function AddPayment() {
       });
     }
   };
+
+
 
  return (
   <div className="bg-gradient-to-b from-gray-50 to-gray-200 p-8 flex items-center justify-center min-h-screen">

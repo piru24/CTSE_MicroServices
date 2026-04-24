@@ -17,39 +17,43 @@ const Products = () => {
   const { isLoggedIn, token } = useSelector((state) => state.auth);
   const [searchQuery, setSearchQuery] = useState("");
 
-  useEffect(() => {
-    const getProducts = async () => {
-      try {
-        if (isLoggedIn) {
-          const res = await axios.get(
-            "http://localhost:8072/products/getProducts",
-            {
-              withCredentials: true,
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
+useEffect(() => {
+  const getProducts = async () => {
+    try {
+      if (isLoggedIn) {
 
-          // ensure sellerAvailable exists
-          const backendProducts = res.data.map((p) => ({
-            ...p,
-            sellerAvailable:
-              p.sellerAvailable !== undefined ? p.sellerAvailable : true,
-          }));
+        const storedToken = localStorage.getItem("token");
+        const cleanToken = storedToken?.replace(/"/g, "");
 
-          setProducts([...staticProducts, ...backendProducts]);
-        } else {
-          setProducts(staticProducts);
-        }
-      } catch (err) {
-        console.log(err);
+        const res = await axios.get(
+          "https://product-service.agreeablestone-66d4ad90.southeastasia.azurecontainerapps.io/products/getProducts",
+          {
+            headers: {
+              Authorization: `Bearer ${cleanToken}`,
+            },
+          }
+        );
+
+        const backendProducts = res.data.map((p) => ({
+          ...p,
+          sellerAvailable:
+            p.sellerAvailable !== undefined ? p.sellerAvailable : true,
+        }));
+
+        setProducts([...staticProducts, ...backendProducts]);
+
+      } else {
         setProducts(staticProducts);
       }
-    };
 
-    getProducts();
-  }, [isLoggedIn]);
+    } catch (err) {
+      console.log(err);
+      setProducts(staticProducts);
+    }
+  };
+
+  getProducts();
+}, [isLoggedIn, token]);
 
   const filteredProducts = products.filter((product) =>
     product.name.toLowerCase().includes(searchQuery.toLowerCase())

@@ -36,7 +36,7 @@ const Notify = () => {
       try {
         setLoading(true);
         const res = await axios.get(
-          `http://localhost:8020/order/getOrder/${orderId}`,
+          `https://order-service.agreeablestone-66d4ad90.southeastasia.azurecontainerapps.io/order/getOrder/${orderId}`,
           { withCredentials: true }
         );
         if (res.data) {

@@ -70,7 +70,7 @@ const Home = () => {
         if (isLoggedIn) {
 
           const res = await axios.get(
-            "http://localhost:8072/products/getProducts",
+            "https://product-service.agreeablestone-66d4ad90.southeastasia.azurecontainerapps.io/products/getProducts",
             {
               headers: { Authorization: `Bearer ${token}` },
               withCredentials: true

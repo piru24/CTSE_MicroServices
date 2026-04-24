@@ -5,7 +5,7 @@ Run: `npm start`
 ## Config (optional .env)
 
 - `STORE_NAME` – Name shown in receipts/emails (default: `E-Store`)
-- `RABBITMQ_URL` – RabbitMQ broker URL (default: `amqp://localhost:5672`)
+- `RABBITMQ_URL` – RabbitMQ broker URL (default: `amqp://rabbitmq:5672:5672`)
 
 ## API Endpoints
 

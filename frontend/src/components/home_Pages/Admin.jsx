@@ -11,7 +11,7 @@ const Admin = () => {
   useEffect(() => {
     const getUsers = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/user/users", { withCredentials: true });
+        const response = await axios.get("https://auth-service.agreeablestone-66d4ad90.southeastasia.azurecontainerapps.io/user/users", { withCredentials: true });
         const users = response.data.users.map((user) => ({
           id: user._id,
           name: user.name,

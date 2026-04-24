@@ -18,7 +18,7 @@ const ViewOrders = () => {
   useEffect(() => {
     const getOrders = async () => {
       try {
-        const res = await axios.get(`http://localhost:8020/order/getOrders`);
+        const res = await axios.get(`https://order-service.agreeablestone-66d4ad90.southeastasia.azurecontainerapps.io/order/getOrders`);
         setOrders(res.data);
       } catch (err) {
         console.error("Error fetching orders:", err);
@@ -31,7 +31,7 @@ const ViewOrders = () => {
   const handleUpdateState = async (orderId, newState) => {
     try {
       const res = await axios.put(
-        `http://localhost:8020/order/updateOrder/${orderId}`,
+        `https://order-service.agreeablestone-66d4ad90.southeastasia.azurecontainerapps.io/order/updateOrder/${orderId}`,
         { status: newState }
       );
       const updatedOrder = res.data;

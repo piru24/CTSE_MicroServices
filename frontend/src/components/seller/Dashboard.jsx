@@ -16,57 +16,78 @@ const SellerDashboard = () => {
   const [isAvailable, setIsAvailable] = useState(false);
 
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
+  const fetchData = async () => {
+    setLoading(true);
 
-      try {
-        const sellerRes = await axios.get(
-          "http://localhost:5000/user/profile",
-          { withCredentials: true }
-        );
-
-        setSellerInfo(sellerRes.data.user);
-        setIsAvailable(sellerRes.data.user.isAvailable);
-
-        const productsRes = await axios.get(
-          `http://localhost:8072/products/${sellerRes.data.user._id}/products`,
-          { withCredentials: true }
-        );
-
-        setProducts(productsRes.data);
-      } catch (error) {
-        Swal.fire("Error", "Failed to load data", "error");
-      }
-
-      setLoading(false);
-    };
-
-    fetchData();
-  }, []);
-
-  const toggleAvailability = async () => {
     try {
-      const res = await axios.put(
-        "http://localhost:5000/user/seller/availability",
+      const storedToken = localStorage.getItem("token");
+      const cleanToken = storedToken?.replace(/"/g, "");
+
+      // 🔹 1. Get seller profile
+      const sellerRes = await axios.get(
+        "https://auth-service.agreeablestone-66d4ad90.southeastasia.azurecontainerapps.io/user/profile",
         {
-          isAvailable: !isAvailable,
-        },
-        {
-          withCredentials: true,
+          headers: {
+            Authorization: `Bearer ${cleanToken}`,
+          },
         }
       );
 
-      setIsAvailable(res.data.isAvailable);
+      setSellerInfo(sellerRes.data.user);
+      setIsAvailable(sellerRes.data.user.isAvailable);
 
-      Swal.fire(
-        "Success",
-        res.data.isAvailable ? "Shop is now OPEN" : "Shop is now CLOSED",
-        "success"
+      // 🔹 2. Get seller products
+      const productsRes = await axios.get(
+        `https://product-service.agreeablestone-66d4ad90.southeastasia.azurecontainerapps.io/products/${sellerRes.data.user._id}/products`,
+        {
+          headers: {
+            Authorization: `Bearer ${cleanToken}`,
+          },
+        }
       );
+
+      setProducts(productsRes.data);
+
     } catch (error) {
-      Swal.fire("Error", "Failed to update availability", "error");
+      console.log("ERROR:", error.response?.data || error.message);
+
+      Swal.fire("Error", "Failed to load data", "error");
     }
+
+    setLoading(false);
   };
+
+  fetchData();
+}, []);
+ const toggleAvailability = async () => {
+  try {
+    const token = localStorage.getItem("token")?.replace(/"/g, "");
+
+    const res = await axios.put(
+      "https://auth-service.agreeablestone-66d4ad90.southeastasia.azurecontainerapps.io/user/seller/availability",
+      {
+        isAvailable: !isAvailable,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    setIsAvailable(res.data.isAvailable);
+
+    Swal.fire(
+      "Success",
+      res.data.isAvailable ? "Shop is now OPEN" : "Shop is now CLOSED",
+      "success"
+    );
+
+  } catch (error) {
+    console.log(error.response?.data || error.message);
+    Swal.fire("Error", "Failed to update availability", "error");
+  }
+};
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
@@ -81,60 +102,83 @@ const SellerDashboard = () => {
     reader.readAsDataURL(file);
   };
 
-  const handleDelete = async (productId) => {
-    try {
-      await axios.delete(
-        `http://localhost:8072/products/deleteProduct/${productId}`,
-        { withCredentials: true }
-      );
+const handleDelete = async (productId) => {
+  try {
+    const token = localStorage.getItem("token")?.replace(/"/g, "");
 
-      setProducts(products.filter((p) => p._id !== productId));
-
-      Swal.fire("Deleted!", "Product removed successfully", "success");
-    } catch (error) {
-      Swal.fire("Error", "Deletion failed", "error");
-    }
-  };
-
-  const handleFormSubmit = async (formData) => {
-    try {
-      const productData = {
-        ...formData,
-        sellerId: sellerInfo._id,
-        sellerName: sellerInfo.name,
-      };
-
-      if (editingProduct) {
-        const res = await axios.put(
-          `http://localhost:8072/products/updateProduct/${editingProduct._id}`,
-          productData,
-          { withCredentials: true }
-        );
-
-        setProducts(
-          products.map((p) => (p._id === res.data._id ? res.data : p))
-        );
-      } else {
-        const res = await axios.post(
-          "http://localhost:8072/products/addProduct",
-          productData,
-          { withCredentials: true }
-        );
-
-        setProducts([...products, res.data]);
+    await axios.delete(
+      `https://product-service.agreeablestone-66d4ad90.southeastasia.azurecontainerapps.io/products/deleteProduct/${productId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       }
+    );
 
-      setShowForm(false);
-      setEditingProduct(null);
-    } catch (error) {
-      Swal.fire(
-        "Error",
-        error.response?.data?.message || "Operation failed",
-        "error"
+    setProducts(products.filter((p) => p._id !== productId));
+
+    Swal.fire("Deleted!", "Product removed successfully", "success");
+
+  } catch (error) {
+    console.log(error.response?.data || error.message);
+    Swal.fire("Error", "Deletion failed", "error");
+  }
+};
+const handleFormSubmit = async (formData) => {
+  try {
+    // ✅ get token here
+    const token = localStorage.getItem("token")?.replace(/"/g, "");
+
+    const productData = {
+      ...formData,
+      sellerId: sellerInfo._id,
+      sellerName: sellerInfo.name,
+    };
+
+    if (editingProduct) {
+      // 🔄 UPDATE PRODUCT
+      const res = await axios.put(
+        `https://product-service.agreeablestone-66d4ad90.southeastasia.azurecontainerapps.io/products/updateProduct/${editingProduct._id}`,
+        productData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
-    }
-  };
 
+      setProducts(
+        products.map((p) => (p._id === editingProduct._id ? res.data : p))
+      );
+
+    } else {
+      // ➕ ADD PRODUCT
+      const res = await axios.post(
+        "https://product-service.agreeablestone-66d4ad90.southeastasia.azurecontainerapps.io/products/addProduct",
+        productData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setProducts([...products, res.data]);
+    }
+
+    setShowForm(false);
+    setEditingProduct(null);
+
+  } catch (error) {
+    console.log("ERROR:", error.response?.data || error.message);
+
+    Swal.fire(
+      "Error",
+      error.response?.data?.message || "Operation failed",
+      "error"
+    );
+  }
+};
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-500 via-gray-400 to-green-700">
       <div className="container mx-auto px-4 py-8">

@@ -1,0 +1,30 @@
+name: Build & Push Images
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Docker Login
+        run: |
+          echo ${{ secrets.ACR_PASSWORD }} | docker login ${{ secrets.ACR_LOGIN_SERVER }} -u ${{ secrets.ACR_USERNAME }} --password-stdin
+
+      # 🔹 PRODUCT SERVICE
+      - name: Build & Push Product
+        run: |
+          docker build -t ${{ secrets.ACR_LOGIN_SERVER }}/product-service:v1 ./backend/services/products
+          docker push ${{ secrets.ACR_LOGIN_SERVER }}/product-service:v1
+
+      # 🔹 AUTH SERVICE
+      - name: Build & Push Auth
+        run: |
+          docker build -t ${{ secrets.ACR_LOGIN_SERVER }}/auth-service:v1 ./backend/services/auth
+          docker push ${{ secrets.ACR_LOGIN_SERVER }}/auth-service:v1

@@ -13,20 +13,44 @@ const Productinfo = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    const getProduct = async () => {
-      try {
-        const response = await axios.get(
-          `http://localhost:8072/products/getProduct/${id}`
-        );
-        setProduct(response.data.product);
-      } catch (err) {
-        console.log(err);
-      }
-    };
-    getProduct();
-  }, [id]);
+useEffect(() => {
+  const getProduct = async () => {
+    try {
+      const storedToken = localStorage.getItem("token");
+      const cleanToken = storedToken?.replace(/"/g, "");
 
+      console.log("👉 Route ID:", id);
+
+      if (!id) {
+        console.log("❌ ID is missing");
+        return;
+      }
+
+      const response = await axios.get(
+        `https://product-service.agreeablestone-66d4ad90.southeastasia.azurecontainerapps.io/products/getProduct/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${cleanToken}`,
+          },
+        }
+      );
+
+      console.log("✅ Product fetched:", response.data);
+
+      if (response.data?.product) {
+        setProduct(response.data.product);
+      } else {
+        console.log("⚠️ No product in response");
+      }
+
+    } catch (err) {
+      console.log("❌ ERROR STATUS:", err.response?.status);
+      console.log("❌ ERROR DATA:", err.response?.data || err.message);
+    }
+  };
+
+  getProduct();
+}, [id]);
   const handleQuantity = (type) => {
     if (type === "dec") {
       quantity > 1 && setQuantity(quantity - 1);

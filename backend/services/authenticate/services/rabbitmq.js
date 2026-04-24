@@ -2,9 +2,22 @@ const amqp = require("amqplib");
 
 let channel = null;
 
-async function connectRabbitMQ() {
+const RABBITMQ_URL =
+  process.env.RABBITMQ_URL || "amqp://rabbitmq:5672";
+
+// 🔁 Retry connection
+async function connectRabbitMQ(retries = 10) {
   try {
-    const connection = await amqp.connect(process.env.RABBITMQ_URL);
+    const connection = await amqp.connect(RABBITMQ_URL);
+
+    connection.on("error", (err) => {
+      console.error("RabbitMQ connection error:", err.message);
+    });
+
+    connection.on("close", () => {
+      console.warn("RabbitMQ connection closed. Reconnecting...");
+      setTimeout(() => connectRabbitMQ(), 5000);
+    });
 
     channel = await connection.createChannel();
 
@@ -13,72 +26,77 @@ async function connectRabbitMQ() {
 
     // Exchange for microservice events
     await channel.assertExchange("user.events", "topic", {
-      durable: true
+      durable: true,
     });
 
-    console.log("RabbitMQ connected");
+    console.log("✅ RabbitMQ connected");
 
   } catch (error) {
-    console.log("RabbitMQ connection failed:", error.message);
+    console.log(`❌ RabbitMQ not ready, retrying... (${retries})`);
+
+    if (retries === 0) {
+      console.error("❌ Failed to connect to RabbitMQ");
+      return;
+    }
+
+    await new Promise((res) => setTimeout(res, 5000));
+    return connectRabbitMQ(retries - 1);
   }
 }
 
-
-// Email verification event
-function publishUserSignup(data) {
-
+// 🔐 Safe publish helper
+function isChannelReady() {
   if (!channel) {
-    console.log("RabbitMQ not ready. Skipping user_signup event.");
-    return;
+    console.log("⚠️ RabbitMQ not ready. Skipping event.");
+    return false;
   }
+  return true;
+}
+
+// 📧 Email verification event
+function publishUserSignup(data) {
+  if (!isChannelReady()) return;
 
   channel.sendToQueue(
     "user_signup",
-    Buffer.from(JSON.stringify(data))
+    Buffer.from(JSON.stringify(data)),
+    { persistent: true }
   );
 
-  console.log("Signup event sent to Email Service");
+  console.log("📨 Signup event sent to Email Service");
 }
 
-
-// Event-driven microservice event
+// 📡 User created event
 function publishUserCreated(user) {
-
-  if (!channel) {
-    console.log("RabbitMQ not ready. Skipping user_created event.");
-    return;
-  }
+  if (!isChannelReady()) return;
 
   channel.publish(
     "user.events",
     "user.created",
-    Buffer.from(JSON.stringify(user))
+    Buffer.from(JSON.stringify(user)),
+    { persistent: true }
   );
 
-  console.log("User created event published");
+  console.log("📡 User created event published");
 }
 
-
+// 📦 Seller availability event
 function publishSellerAvailability(data) {
-
-  if (!channel) {
-    console.log("RabbitMQ not ready. Skipping seller availability event.");
-    return;
-  }
+  if (!isChannelReady()) return;
 
   channel.publish(
     "user.events",
     "seller.availability.changed",
-    Buffer.from(JSON.stringify(data))
+    Buffer.from(JSON.stringify(data)),
+    { persistent: true }
   );
 
-  console.log("Seller availability event published");
+  console.log("📦 Seller availability event published");
 }
-
 
 module.exports = {
   connectRabbitMQ,
   publishUserSignup,
   publishUserCreated,
-  publishSellerAvailability
+  publishSellerAvailability,
 };
