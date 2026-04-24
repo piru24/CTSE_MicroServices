@@ -77,8 +77,7 @@ jobs:
          exit-code: 0
 
       # 🔹 CD
-      - name: Install Azure CLI
-        uses: azure/setup-azure-cli@v3
+      
 
       - name: Azure Login
         uses: azure/login@v1
