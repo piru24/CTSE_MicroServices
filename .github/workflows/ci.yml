@@ -28,3 +28,21 @@ jobs:
         run: |
           docker build -t ${{ secrets.ACR_LOGIN_SERVER }}/auth-service:v1 ./backend/services/authenticate
           docker push ${{ secrets.ACR_LOGIN_SERVER }}/auth-service:v1
+      
+      # 🔹 ORDER SERVICE
+      - name: Build & Push Order
+        run: |
+          docker build -t ${{ secrets.ACR_LOGIN_SERVER }}/order-service:v1 ./backend/services/order
+          docker push ${{ secrets.ACR_LOGIN_SERVER }}/order-service:v1
+
+      # 🔹 DELIVERY SERVICE
+      - name: Build & Push Delivery
+        run: |
+         docker build -t ${{ secrets.ACR_LOGIN_SERVER }}/delivery-service:v1 ./backend/services/delivery
+         docker push ${{ secrets.ACR_LOGIN_SERVER }}/delivery-service:v1
+
+     # 🔹 PAYMENT SERVICE
+      - name: Build & Push Payment
+        run: |
+          docker build -t ${{ secrets.ACR_LOGIN_SERVER }}/payment-service:v1 ./backend/services/payment
+          docker push ${{ secrets.ACR_LOGIN_SERVER }}/payment-service:v1
