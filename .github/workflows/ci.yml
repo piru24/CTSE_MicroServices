@@ -32,7 +32,7 @@ jobs:
       # 🔹 ORDER SERVICE
       - name: Build & Push Order
         run: |
-          docker build -t ${{ secrets.ACR_LOGIN_SERVER }}/order-service:v1 ./backend/services/order
+          docker build -t ${{ secrets.ACR_LOGIN_SERVER }}/order-service:v1 ./backend/services/Order
           docker push ${{ secrets.ACR_LOGIN_SERVER }}/order-service:v1
 
       # 🔹 DELIVERY SERVICE
