@@ -21,7 +21,7 @@ const SellerDashboard = () => {
 
       try {
         const sellerRes = await axios.get(
-          "https://auth-service.agreeablestone-66d4ad90.southeastasia.azurecontainerapps.io/user/profile",
+          "http://localhost:5000/user/profile",
           { withCredentials: true }
         );
 
@@ -29,7 +29,7 @@ const SellerDashboard = () => {
         setIsAvailable(sellerRes.data.user.isAvailable);
 
         const productsRes = await axios.get(
-          `http://localhost:8070/products/${sellerRes.data.user._id}/products`,
+          `http://localhost:8072/products/${sellerRes.data.user._id}/products`,
           { withCredentials: true }
         );
 
@@ -47,7 +47,7 @@ const SellerDashboard = () => {
   const toggleAvailability = async () => {
     try {
       const res = await axios.put(
-        "https://auth-service.agreeablestone-66d4ad90.southeastasia.azurecontainerapps.io/user/seller/availability",
+        "http://localhost:5000/user/seller/availability",
         {
           isAvailable: !isAvailable,
         },
@@ -84,7 +84,7 @@ const SellerDashboard = () => {
   const handleDelete = async (productId) => {
     try {
       await axios.delete(
-        `http://localhost:8070/products/deleteProduct/${productId}`,
+        `http://localhost:8072/products/deleteProduct/${productId}`,
         { withCredentials: true }
       );
 
@@ -106,7 +106,7 @@ const SellerDashboard = () => {
 
       if (editingProduct) {
         const res = await axios.put(
-          `http://localhost:8070/products/updateProduct/${editingProduct._id}`,
+          `http://localhost:8072/products/updateProduct/${editingProduct._id}`,
           productData,
           { withCredentials: true }
         );
@@ -116,7 +116,7 @@ const SellerDashboard = () => {
         );
       } else {
         const res = await axios.post(
-          "http://localhost:8070/products/addProduct",
+          "http://localhost:8072/products/addProduct",
           productData,
           { withCredentials: true }
         );

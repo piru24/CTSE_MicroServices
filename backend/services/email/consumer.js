@@ -16,7 +16,7 @@ async function startConsumer() {
   try {
 
     // Connect to RabbitMQ
-    const connection = await amqp.connect("amqp://localhost");
+    const connection = await amqp.connect("amqp://rabbitmq");
 
     const channel = await connection.createChannel();
 
@@ -35,7 +35,7 @@ async function startConsumer() {
         console.log("📩 Signup event received:", data);
 
         const verifyLink =
-          `https://auth-service.agreeablestone-66d4ad90.southeastasia.azurecontainerapps.io/user/verify/${data.token}`;
+          `http://localhost:5000/user/verify/${data.token}`;
 
         try {
 

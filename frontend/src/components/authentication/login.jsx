@@ -5,14 +5,14 @@ import axios from "axios";
 import InputField from "../ui/InputField";
 import Loader from "../Loader";
 import { Link } from "react-router-dom";
-
+//http://localhost:5000
 // ✅ Axios global config
 axios.defaults.withCredentials = true;
 
 // ✅ API BASE
 const API_BASE =
   process.env.REACT_APP_API_BASE ||
-  "https://auth-service.agreeablestone-66d4ad90.southeastasia.azurecontainerapps.io";
+  "http://localhost:5000";
 
 const LoginModal = ({ isOpen, onClose, onSuccess }) => {
   const dispatch = useDispatch();

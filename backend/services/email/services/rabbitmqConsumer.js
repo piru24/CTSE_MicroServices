@@ -8,7 +8,7 @@ async function startEmailConsumer() {
 
   try {
 
-    const connection = await amqp.connect("amqp://rabbitmq:5672");
+    const connection = await amqp.connect("amqp://localhost");
 
     const channel = await connection.createChannel();
 

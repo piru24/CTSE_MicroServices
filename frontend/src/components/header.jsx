@@ -16,7 +16,7 @@ axios.defaults.withCredentials = true;
 
 const API_BASE =
   process.env.REACT_APP_API_BASE ||
-  "https://auth-service.agreeablestone-66d4ad90.southeastasia.azurecontainerapps.io";
+  "http://localhost:5000";
 
 const NAV_CONFIG = {
   buyer: [

@@ -70,7 +70,7 @@ const Home = () => {
         if (isLoggedIn) {
 
           const res = await axios.get(
-            "http://localhost:8070/products/getProducts",
+            "http://localhost:8072/products/getProducts",
             {
               headers: { Authorization: `Bearer ${token}` },
               withCredentials: true

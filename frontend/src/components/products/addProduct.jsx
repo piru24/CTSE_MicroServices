@@ -33,7 +33,7 @@ export default function AddProducts() {
   const addProducts = (e) => {
     e.preventDefault();
     axios
-      .post("http://localhost:8070/products/addProduct", products, { withCredentials: true, headers: {
+      .post("http://localhost:8072/products/addProduct", products, { withCredentials: true, headers: {
       Authorization: `Bearer ${token}`
     } })
       .then(() => {

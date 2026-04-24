@@ -17,7 +17,7 @@ const Productinfo = () => {
     const getProduct = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8070/products/getProduct/${id}`
+          `http://localhost:8072/products/getProduct/${id}`
         );
         setProduct(response.data.product);
       } catch (err) {

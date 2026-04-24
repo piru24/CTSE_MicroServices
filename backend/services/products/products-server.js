@@ -15,7 +15,7 @@ app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ limit: "10mb", extended: true }));
 
 //using dependencies
-app.use(cors({credentials: true, origin: ["http://localhost:3000", "http://food-app.127.0.0.1.nip.io"]
+app.use(cors({credentials: true, origin: ["http://localhost:3000"]
 }));
 app.use(bodyParser.json());
 app.use("/products",router)
