@@ -18,8 +18,8 @@ const addOrder = async (req, res) => {
 
     // 🔥 CALL PAYMENT SERVICE
     try {
-      await axios.post(
-        "http://localhost:8500/payment/card",
+     await axios.post(
+          "http://host.docker.internal:8500/payment/card",
         {
           tokenId: "tok_visa",
           amount: order.amount,
@@ -57,8 +57,8 @@ const updateOrder = async (req, res) => {
       try {
         console.log("🚀 Creating delivery for dispatched order...");
 
-        await axios.post(
-          "http://localhost:8300/delivery/create",
+       await axios.post(
+           "http://host.docker.internal:8300/delivery/create",
           {
             orderId: updatedOrder._id,
             userId: updatedOrder.userId,
