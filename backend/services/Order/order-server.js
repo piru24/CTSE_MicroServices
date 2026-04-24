@@ -16,9 +16,13 @@ const CORS_ORIGIN = process.env.CORS_ORIGIN || "http://localhost:3000";
 app.use(cookieParser());
 
 app.use(cors({
-  origin: CORS_ORIGIN,
+  origin: [
+    "http://localhost:3000",
+    "https://your-frontend-domain.com" // later add Vercel URL
+  ],
   credentials: true,
-  methods: ['GET','POST','PUT','DELETE']
+  methods: ['GET','POST','PUT','DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 app.use(bodyParser.json());

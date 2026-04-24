@@ -21,20 +21,37 @@ jobs:
       - name: Build & Push Product
         run: |
           docker build -t ${{ secrets.ACR_LOGIN_SERVER }}/product-service:v1 ./backend/services/products
-          docker push ${{ secrets.ACR_LOGIN_SERVER }}/product-service:v1
+          docker push ${{ secrets.ACR_LOGIN_SERVER }}/product-service:v5
+
+      - name: Scan Product Image (Trivy)
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ secrets.ACR_LOGIN_SERVER }}/product-service:v5
+          format: table
+          exit-code: 0
 
       # 🔹 AUTH SERVICE
       - name: Build & Push Auth
         run: |
           docker build -t ${{ secrets.ACR_LOGIN_SERVER }}/auth-service:v1 ./backend/services/authenticate
           docker push ${{ secrets.ACR_LOGIN_SERVER }}/auth-service:v1
-      
+      - name: Scan Auth Image (Trivy)
+        uses: aquasecurity/trivy-action@master
+        with:
+         image-ref: ${{ secrets.ACR_LOGIN_SERVER }}/auth-service:v1
+         format: table
+         exit-code: 0
       # 🔹 ORDER SERVICE
       - name: Build & Push Order
         run: |
           docker build -t ${{ secrets.ACR_LOGIN_SERVER }}/order-service:v1 ./backend/services/Order
           docker push ${{ secrets.ACR_LOGIN_SERVER }}/order-service:v1
-
+      - name: Scan Order Image (Trivy)
+        uses: aquasecurity/trivy-action@master
+        with:
+         image-ref: ${{ secrets.ACR_LOGIN_SERVER }}/order-service:v1
+         format: table
+         exit-code: 0
       # 🔹 DELIVERY SERVICE
       - name: Build & Push Delivery
         run: |

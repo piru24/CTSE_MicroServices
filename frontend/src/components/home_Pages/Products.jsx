@@ -5,7 +5,6 @@ import { FiSearch, FiInfo, FiStar, FiHeart } from "react-icons/fi";
 import { MdAddShoppingCart } from "react-icons/md";
 import { useSelector } from "react-redux";
 
-axios.defaults.withCredentials = true;
 
 const staticProducts = [
 
