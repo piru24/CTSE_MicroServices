@@ -9,7 +9,7 @@ axios.defaults.withCredentials = true;
 
 const API_BASE =
   process.env.REACT_APP_API_BASE ||
-  "http://localhost:5000";
+  "https://auth-service.agreeablestone-66d4ad90.southeastasia.azurecontainerapps.io";
 
 const UpdateACC = () => {
   const navigate = useNavigate();
